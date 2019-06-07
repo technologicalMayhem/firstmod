@@ -1,0 +1,27 @@
+package technologicalmayhem.firstmod.proxy;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import technologicalmayhem.firstmod.ModBlocks;
+import technologicalmayhem.firstmod.blocks.*;
+
+@Mod.EventBusSubscriber
+public class CommonProxy
+{
+    @SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<Block> event)
+    {
+        event.getRegistry().register(new FirstBlock());
+    }
+
+    
+    @SubscribeEvent
+    public static void registerItems(RegistryEvent.Register<Item> event)
+    {
+        event.getRegistry().register(new ItemBlock(ModBlocks.firstBlock).setRegistryName(ModBlocks.firstBlock.getRegistryName()));
+    }
+}
