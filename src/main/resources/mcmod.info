@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "firstmod",
+  "name": "First Mod",
+  "description": "technologicalMayhem's first mod.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["technologicalMayhem"],
+  "credits": "technologicalMayhem",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
