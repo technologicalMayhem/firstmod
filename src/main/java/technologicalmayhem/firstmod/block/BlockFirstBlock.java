@@ -33,9 +33,11 @@ public class BlockFirstBlock extends Block {
 
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
-        if (pos.getY() != 256) {
-            for (int i = 0; i < 256; i++) {
-                worldIn.setBlockState(pos.up(i), ModBlocks.firstBlock.getDefaultState());
+        if (placer.isSneaking()) {
+            if (pos.getY() != 256) {
+                for (int i = 0; i < 256; i++) {
+                    worldIn.setBlockState(pos.up(i), ModBlocks.firstBlock.getDefaultState());
+                }
             }
         }
     }
