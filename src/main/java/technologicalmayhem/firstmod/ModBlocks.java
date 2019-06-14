@@ -10,8 +10,12 @@ public class ModBlocks
     @GameRegistry.ObjectHolder("firstmod:firstblock")
     public static BlockFirstBlock firstBlock;
 
+    @GameRegistry.ObjectHolder("firstmod:detonatingfurnace")
+    public static BlockDetonatingFurnace detonatingFurnace;
+
     @SideOnly(Side.CLIENT)
     public static void initModels() {
         firstBlock.initModel();
+        detonatingFurnace.initModel();
     }
 }

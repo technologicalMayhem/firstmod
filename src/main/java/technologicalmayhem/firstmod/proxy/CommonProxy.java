@@ -17,6 +17,7 @@ public class CommonProxy
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().register(new BlockFirstBlock());
+        event.getRegistry().register(new BlockDetonatingFurnace());
     }
 
     
@@ -26,5 +27,6 @@ public class CommonProxy
         event.getRegistry().register(new ItemWeirdShard());
 
         event.getRegistry().register(new ItemBlock(ModBlocks.firstBlock).setRegistryName(ModBlocks.firstBlock.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(ModBlocks.detonatingFurnace).setRegistryName(ModBlocks.detonatingFurnace.getRegistryName()));
     }
 }
