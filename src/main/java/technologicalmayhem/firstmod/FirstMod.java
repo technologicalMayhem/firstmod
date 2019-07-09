@@ -1,9 +1,13 @@
 package technologicalmayhem.firstmod;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import technologicalmayhem.firstmod.block.TileEntityDetonatingFurnace;
+
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = FirstMod.MODID, name = FirstMod.NAME, version = FirstMod.VERSION)
@@ -19,6 +23,7 @@ public class FirstMod
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        GameRegistry.registerTileEntity(TileEntityDetonatingFurnace.class, new ResourceLocation(MODID, "tileentitydetonatingfurnace"));
     }
 
     @EventHandler
