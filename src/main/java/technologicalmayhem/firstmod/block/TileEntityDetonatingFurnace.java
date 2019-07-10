@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -24,7 +25,10 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 	Integer remainingTime = 0;
 	Integer totalTime = 0;
 
-	IItemHandler smeltables = new ItemStackHandler(8){
+	NonNullList<ItemStack> smeltables = NonNullList.<ItemStack>withSize(8, ItemStack.EMPTY);
+	NonNullList<ItemStack> fuel = NonNullList.<ItemStack>withSize(1, ItemStack.EMPTY);
+
+	IItemHandler smeltablesHandler = new ItemStackHandler(smeltables){
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 			if(!FurnaceRecipes.instance().getSmeltingResult(stack).isEmpty()) {
@@ -33,7 +37,7 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 			return stack;
 		}
 	};
-	IItemHandler fuelHandler = new ItemStackHandler(1)
+	IItemHandler fuelHandler = new ItemStackHandler(fuel)
 	{
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
@@ -43,7 +47,7 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 			return stack;
 		}
 	};
-	ArrayList<ItemStack> result = new ArrayList<ItemStack>();
+	protected ArrayList<ItemStack> result = new ArrayList<ItemStack>();
 
 	public TileEntityDetonatingFurnace()
 	{
@@ -65,16 +69,16 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 	{
 		int totalCookTime = 0;
 		int totalFuel = 0;
-		for (int i = 0; i < smeltables.getSlots(); i++) {
-			totalCookTime += smeltables.getStackInSlot(i).getCount() * 200;
+		for (int i = 0; i < smeltablesHandler.getSlots(); i++) {
+			totalCookTime += smeltablesHandler.getStackInSlot(i).getCount() * 200;
 		}
 		for (int i = 0; i < fuelHandler.getSlots(); i++) {
 			ItemStack fuel = fuelHandler.getStackInSlot(i);
 			totalFuel += TileEntityFurnace.getItemBurnTime(fuel) * fuel.getCount();
 		}
 		if (totalCookTime <= totalFuel) {
-			for (int i = 0; i < smeltables.getSlots(); i++) {
-				ItemStack item = smeltables.getStackInSlot(i);
+			for (int i = 0; i < smeltablesHandler.getSlots(); i++) {
+				ItemStack item = smeltablesHandler.getStackInSlot(i);
 				ItemStack smeltResult = FurnaceRecipes.instance().getSmeltingResult(item);
 				smeltResult.setCount(item.getCount());
 				result.add(smeltResult);
@@ -99,9 +103,9 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 				for (int i = 0; i < fuelHandler.getSlots(); i++) {
 					fuelHandler.extractItem(0, 64, false);
 				}
-				smeltables = new ItemStackHandler(8);
+				smeltablesHandler = new ItemStackHandler(8);
 				for (int i = 0; i < result.size(); i++) {
-					smeltables.insertItem(i, result.get(i), false);
+					smeltablesHandler.insertItem(i, result.get(i), false);
 				}
 				world.destroyBlock(pos, false);
 			}
@@ -118,7 +122,7 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && side == EnumFacing.UP)
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(fuelHandler);
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(smeltables);
+			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(smeltablesHandler);
 		return super.getCapability(cap, side);
 	}
 }
