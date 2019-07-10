@@ -16,15 +16,12 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import scala.swing.TextComponent;
 import technologicalmayhem.firstmod.FirstMod;
-import technologicalmayhem.firstmod.ModBlocks;
 
 public class BlockDetonatingFurnace extends Block  {
 
