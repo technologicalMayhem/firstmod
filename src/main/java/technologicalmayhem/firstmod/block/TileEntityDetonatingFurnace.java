@@ -16,8 +16,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import technologicalmayhem.firstmod.FirstMod;
 
 public class TileEntityDetonatingFurnace extends TileEntity implements ITickable, ICapabilityProvider {
 
@@ -28,7 +28,7 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 	NonNullList<ItemStack> smeltables = NonNullList.<ItemStack>withSize(8, ItemStack.EMPTY);
 	NonNullList<ItemStack> fuel = NonNullList.<ItemStack>withSize(1, ItemStack.EMPTY);
 
-	IItemHandler smeltablesHandler = new ItemStackHandler(smeltables) {
+	ItemStackHandler smeltablesHandler = new ItemStackHandler(smeltables) {
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 			if (!FurnaceRecipes.instance().getSmeltingResult(stack).isEmpty()) {
@@ -37,7 +37,7 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 			return stack;
 		}
 	};
-	IItemHandler fuelHandler = new ItemStackHandler(fuel) {
+	ItemStackHandler fuelHandler = new ItemStackHandler(fuel) {
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 			if (TileEntityFurnace.getItemBurnTime(stack) > 0) {
@@ -48,26 +48,35 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 	};
 	protected ArrayList<ItemStack> result = new ArrayList<ItemStack>();
 
-	public TileEntityDetonatingFurnace() {
-
-	}
-
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		super.writeToNBT(compound);
+		FirstMod.logger.debug("Write: " + compound);
+		compound.setBoolean("burning", isBurning);
+		compound.setInteger("timeLeft", remainingTime);
+		compound.setInteger("totalTime", totalTime);
+		compound.setTag("smeltables", smeltablesHandler.serializeNBT());
+		compound.setTag("fuel", fuelHandler.serializeNBT());
 		return compound;
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
-
-	}
+		FirstMod.logger.debug("Read: " + compound);
+		isBurning = compound.getBoolean("burning");
+		remainingTime = compound.getInteger("timeLeft");
+		totalTime = compound.getInteger("totalTime");
+		smeltablesHandler.deserializeNBT(compound.getCompoundTag("smeltables"));
+		fuelHandler.deserializeNBT(compound.getCompoundTag("fuel"));
+	}	
 
 	public void ignite(EntityPlayer playerIn) {
 		int totalCookTime = 0;
 		int totalFuel = 0;
+		int totalItems = 0;
 		for (int i = 0; i < smeltablesHandler.getSlots(); i++) {
 			totalCookTime += smeltablesHandler.getStackInSlot(i).getCount() * 200;
+			totalItems += smeltablesHandler.getStackInSlot(i).getCount();
 		}
 		for (int i = 0; i < fuelHandler.getSlots(); i++) {
 			ItemStack fuel = fuelHandler.getStackInSlot(i);
@@ -81,7 +90,8 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 				result.add(smeltResult);
 			}
 			totalTime = totalCookTime;
-			remainingTime = totalCookTime / 4;
+			//remainingTime = totalCookTime / 8;
+			remainingTime = (int)Math.round(totalCookTime * (1 - (1.1 * totalItems / (totalItems + 200))));
 			isBurning = true;
 		} else {
 			playerIn.sendMessage(new TextComponentString("There is not enough fuel."));
@@ -95,7 +105,8 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 				world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, true,
 						pos.getX() + 0.5 + (0.25 * (world.rand.nextDouble() - 0.5)), pos.getY() + 1,
 						pos.getZ() + 0.5 + (0.25 * (world.rand.nextDouble() - 0.5)), 0, 0.1, 0);
-				if (world.rand.nextInt(4) == 0) world.spawnParticle(EnumParticleTypes.LAVA, true, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0.5, 0);
+				if (world.rand.nextInt(4) == 0) 
+					world.spawnParticle(EnumParticleTypes.LAVA, true, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0.5, 0);
 			} else if (!world.isRemote) {
 				remainingTime--;
 				if (remainingTime.equals(0)) {
