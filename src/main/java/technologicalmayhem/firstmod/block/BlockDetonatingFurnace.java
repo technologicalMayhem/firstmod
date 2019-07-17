@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -43,11 +44,10 @@ public class BlockDetonatingFurnace extends Block  {
 		
 		TileEntityDetonatingFurnace furnace = (TileEntityDetonatingFurnace)worldIn.getTileEntity(pos);
 
-		if (furnace.isBurning) {
-			return false;
+		if (furnace.isBurning && !worldIn.isRemote) {
+			playerIn.sendMessage(new TextComponentString("Time left: " + (furnace.remainingTime / 20) + " seconds [" + furnace.remainingTime + " ticks]"));
 		}
-
-		if (!playerIn.isSneaking()) {
+		else if (!playerIn.isSneaking()) {
 			if (playerIn.getHeldItemMainhand().getItem().getClass().equals(ItemFlintAndSteel.class)) {
 				furnace.ignite(playerIn);
 			}

@@ -28,17 +28,16 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 	NonNullList<ItemStack> smeltables = NonNullList.<ItemStack>withSize(8, ItemStack.EMPTY);
 	NonNullList<ItemStack> fuel = NonNullList.<ItemStack>withSize(1, ItemStack.EMPTY);
 
-	IItemHandler smeltablesHandler = new ItemStackHandler(smeltables){
+	IItemHandler smeltablesHandler = new ItemStackHandler(smeltables) {
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if(!FurnaceRecipes.instance().getSmeltingResult(stack).isEmpty()) {
+			if (!FurnaceRecipes.instance().getSmeltingResult(stack).isEmpty()) {
 				return super.insertItem(slot, stack, simulate);
 			}
 			return stack;
 		}
 	};
-	IItemHandler fuelHandler = new ItemStackHandler(fuel)
-	{
+	IItemHandler fuelHandler = new ItemStackHandler(fuel) {
 		@Override
 		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 			if (TileEntityFurnace.getItemBurnTime(stack) > 0) {
@@ -49,8 +48,7 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 	};
 	protected ArrayList<ItemStack> result = new ArrayList<ItemStack>();
 
-	public TileEntityDetonatingFurnace()
-	{
+	public TileEntityDetonatingFurnace() {
 
 	}
 
@@ -62,11 +60,10 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
-		
+
 	}
 
-	public void ignite(EntityPlayer playerIn)
-	{
+	public void ignite(EntityPlayer playerIn) {
 		int totalCookTime = 0;
 		int totalFuel = 0;
 		for (int i = 0; i < smeltablesHandler.getSlots(); i++) {
@@ -86,28 +83,31 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 			totalTime = totalCookTime;
 			remainingTime = totalCookTime / 4;
 			isBurning = true;
-		}
-		else
-		{
+		} else {
 			playerIn.sendMessage(new TextComponentString("There is not enough fuel."));
 		}
 	}
 
 	@Override
 	public void update() {
-		if (isBurning)
-		{
-			world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, true, pos.getX() + 0.5 + (0.25 * (world.rand.nextDouble() - 0.5)), pos.getY() + 1, pos.getZ() + 0.5 + (0.25 * (world.rand.nextDouble() - 0.5)), 0, 0.1, 0);
-			remainingTime--;
-			if (remainingTime.equals(0)) {
-				for (int i = 0; i < fuelHandler.getSlots(); i++) {
-					fuelHandler.extractItem(0, 64, false);
+		if (isBurning) {
+			if (world.isRemote) {
+				world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, true,
+						pos.getX() + 0.5 + (0.25 * (world.rand.nextDouble() - 0.5)), pos.getY() + 1,
+						pos.getZ() + 0.5 + (0.25 * (world.rand.nextDouble() - 0.5)), 0, 0.1, 0);
+				if (world.rand.nextInt(4) == 0) world.spawnParticle(EnumParticleTypes.LAVA, true, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0.5, 0);
+			} else if (!world.isRemote) {
+				remainingTime--;
+				if (remainingTime.equals(0)) {
+					for (int i = 0; i < fuelHandler.getSlots(); i++) {
+						fuelHandler.extractItem(0, 64, false);
+					}
+					smeltablesHandler = new ItemStackHandler(8);
+					for (int i = 0; i < result.size(); i++) {
+						smeltablesHandler.insertItem(i, result.get(i), false);
+					}
+					world.destroyBlock(pos, false);
 				}
-				smeltablesHandler = new ItemStackHandler(8);
-				for (int i = 0; i < result.size(); i++) {
-					smeltablesHandler.insertItem(i, result.get(i), false);
-				}
-				world.destroyBlock(pos, false);
 			}
 		}
 	}
@@ -119,9 +119,9 @@ public class TileEntityDetonatingFurnace extends TileEntity implements ITickable
 
 	@Override
 	public <T> T getCapability(@Nonnull Capability<T> cap, EnumFacing side) {
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && side == EnumFacing.UP)
+		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && side == EnumFacing.UP)
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(fuelHandler);
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(smeltablesHandler);
 		return super.getCapability(cap, side);
 	}
