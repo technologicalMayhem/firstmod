@@ -8,8 +8,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import technologicalmayhem.firstmod.FirstMod;
+import technologicalmayhem.firstmod.block.tile.TilePotentiometer;
+
+import javax.annotation.Nullable;
 
 public class BlockPotentiometer extends Block {
 
@@ -23,12 +27,28 @@ public class BlockPotentiometer extends Block {
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state) {
+    public boolean hasTileEntity(IBlockState state)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side)
+    {
         return true;
     }
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        TilePotentiometer tile = (TilePotentiometer) worldIn.getTileEntity(pos);
+        if(playerIn.isSneaking())
+        {
+            tile.increasePower();
+        }
+        else
+        {
+            tile.decreasePower();
+        }
         return true;
     }
 }
