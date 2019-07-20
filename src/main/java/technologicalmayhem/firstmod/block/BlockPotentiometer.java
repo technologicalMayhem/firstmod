@@ -1,53 +1,95 @@
 package technologicalmayhem.firstmod.block;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneTorch;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.sys.Prop;
 import technologicalmayhem.firstmod.FirstMod;
-import technologicalmayhem.firstmod.block.tile.TilePotentiometer;
 
 import javax.annotation.Nullable;
 
 public class BlockPotentiometer extends Block {
 
-    public BlockPotentiometer()
-    {
+    private static final IProperty<Integer> power = PropertyInteger.create("power", 0, 15);
+
+    public BlockPotentiometer() {
         super(Material.ROCK);
         setUnlocalizedName(FirstMod.MODID + ".potentiometer");
         setRegistryName("potentiometer");
         setHardness(1.0f);
         this.setCreativeTab(CreativeTabs.REDSTONE);
+        setLightLevel(0);
+        setDefaultState(this.blockState.getBaseState().withProperty(power, 0));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0,
+                new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, power);
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
         return true;
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side)
-    {
+    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
         return true;
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(power);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return blockState.getBaseState().withProperty(power, meta);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean canProvidePower(IBlockState state) {
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        return blockState.getValue(power);
     }
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        TilePotentiometer tile = (TilePotentiometer) worldIn.getTileEntity(pos);
-        if(playerIn.isSneaking())
-        {
-            tile.increasePower();
+        if (playerIn.isSneaking() && state.getValue(power) > 0) {
+            worldIn.setBlockState(pos, blockState.getBaseState().withProperty(power, state.getValue(power) - 1));
         }
-        else
-        {
-            tile.decreasePower();
+        if (!playerIn.isSneaking() && state.getValue(power) < 15) {
+            worldIn.setBlockState(pos, blockState.getBaseState().withProperty(power, state.getValue(power) + 1));
         }
         return true;
     }

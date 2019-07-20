@@ -1,0 +1,29 @@
+
+{
+    "forge_marker": 1,
+    "defaults": {
+      "model": "firstmod:potentiometer"
+    },
+    "variants": {
+      "normal": [{}],
+      "inventory": [{"textures": {"all": "firstmod:blocks/potentiometer_00"}}],
+      "power": {
+        "0": { "textures": {"all": "firstmod:blocks/potentiometer_00"} },
+        "1": { "textures": {"all": "firstmod:blocks/potentiometer_01"} },
+        "2": { "textures": {"all": "firstmod:blocks/potentiometer_02"} },
+        "3": { "textures": {"all": "firstmod:blocks/potentiometer_03"} },
+        "4": { "textures": {"all": "firstmod:blocks/potentiometer_04"} },
+        "5": { "textures": {"all": "firstmod:blocks/potentiometer_05"} },
+        "6": { "textures": {"all": "firstmod:blocks/potentiometer_06"} },
+        "7": { "textures": {"all": "firstmod:blocks/potentiometer_07"} },
+        "8": { "textures": {"all": "firstmod:blocks/potentiometer_08"} },
+        "9": { "textures": {"all": "firstmod:blocks/potentiometer_09"} },
+        "10": { "textures": {"all": "firstmod:blocks/potentiometer_10"} },
+        "11": { "textures": {"all": "firstmod:blocks/potentiometer_11"} },
+        "12": { "textures": {"all": "firstmod:blocks/potentiometer_12"} },
+        "13": { "textures": {"all": "firstmod:blocks/potentiometer_13"} },
+        "14": { "textures": {"all": "firstmod:blocks/potentiometer_14"} },
+        "15": { "textures": {"all": "firstmod:blocks/potentiometer_15"} }
+      }
+    }
+  }
