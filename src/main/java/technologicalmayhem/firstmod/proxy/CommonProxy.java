@@ -7,8 +7,9 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import technologicalmayhem.firstmod.ModBlocks;
-import technologicalmayhem.firstmod.block.*;
-import technologicalmayhem.firstmod.item.*;
+import technologicalmayhem.firstmod.block.BlockFirstBlock;
+import technologicalmayhem.firstmod.block.BlockPotentiometer;
+import technologicalmayhem.firstmod.item.ItemWeirdShard;
 
 @Mod.EventBusSubscriber
 public class CommonProxy
