@@ -1,12 +1,11 @@
 package technologicalmayhem.firstmod;
 
-import technologicalmayhem.firstmod.item.*;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import technologicalmayhem.firstmod.item.ItemWeirdShard;
 
-public class ModItems
-{
+public class ModItems {
     @GameRegistry.ObjectHolder("firstmod:weirdshard")
     public static ItemWeirdShard weirdShard;
 

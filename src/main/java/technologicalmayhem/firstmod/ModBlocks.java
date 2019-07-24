@@ -6,8 +6,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import technologicalmayhem.firstmod.block.BlockDetonatingFurnace;
 import technologicalmayhem.firstmod.block.BlockFirstBlock;
 
-public class ModBlocks
-{
+public class ModBlocks {
     @GameRegistry.ObjectHolder("firstmod:firstblock")
     public static BlockFirstBlock firstBlock;
 

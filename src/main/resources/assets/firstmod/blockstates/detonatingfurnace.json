@@ -1,11 +1,14 @@
-
 {
-    "forge_marker": 1,
-    "defaults": {
-      "model": "firstmod:detonatingfurnace"
-    },
-    "variants": {
-      "normal": [{}],
-      "inventory": [{}]
-    }
+  "forge_marker": 1,
+  "defaults": {
+    "model": "firstmod:detonatingfurnace"
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ]
   }
+}
