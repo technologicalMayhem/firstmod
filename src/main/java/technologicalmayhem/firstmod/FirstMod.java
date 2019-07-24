@@ -6,8 +6,8 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-
 import org.apache.logging.log4j.Logger;
+import technologicalmayhem.firstmod.block.tile.TileDetonatingFurnace;
 
 @Mod(modid = FirstMod.MODID, name = FirstMod.NAME, version = FirstMod.VERSION)
 public class FirstMod
@@ -22,6 +22,7 @@ public class FirstMod
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        GameRegistry.registerTileEntity(TileDetonatingFurnace.class, new ResourceLocation(MODID, "tileDetonatingFurnace"));
     }
 
     @EventHandler
