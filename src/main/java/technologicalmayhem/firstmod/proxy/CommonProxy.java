@@ -12,20 +12,17 @@ import technologicalmayhem.firstmod.block.BlockFirstBlock;
 import technologicalmayhem.firstmod.item.ItemWeirdShard;
 
 @Mod.EventBusSubscriber
-public class CommonProxy
-{
+public class CommonProxy {
     @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event)
-    {
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().registerAll(
                 new BlockFirstBlock(),
                 new BlockDetonatingFurnace()
-            );
+        );
     }
-    
+
     @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event)
-    {
+    public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new ItemWeirdShard());
 
         event.getRegistry().register(new ItemBlock(ModBlocks.firstBlock).setRegistryName(ModBlocks.firstBlock.getRegistryName()));

@@ -33,6 +33,6 @@ public enum EnumFurnacePhase implements IStringSerializable {
 
     @Override
     public String getName() {
-        return this.toString();
+        return this.name();
     }
 }

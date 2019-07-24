@@ -53,9 +53,10 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     }
 
     public ItemStack insertSmeltableItem(ItemStack item) {
+        int size = item.getCount();
         for (int i = 0; i < 8; i++) {
-            ItemStack result = items.insertItem(i, item, false);
-            if (!result.equals(item)) return result;
+            item = items.insertItem(i, item, false);
+            if (item.getCount() != size) return item;
         }
         return item;
     }
@@ -127,7 +128,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         compound.setInteger("remainingTime", remainingTime);
-        compound.setString("phase", phase.getName());
+        compound.setString("phase", phase.name());
         compound.setTag("items", items.serializeNBT());
         return compound;
     }

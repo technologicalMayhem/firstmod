@@ -6,6 +6,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFlintAndSteel;
@@ -19,7 +20,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jetbrains.annotations.NotNull;
 import technologicalmayhem.firstmod.FirstMod;
 import technologicalmayhem.firstmod.block.tile.TileDetonatingFurnace;
 import technologicalmayhem.firstmod.util.EnumFurnaceIgnitionResult;
@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
 public class BlockDetonatingFurnace extends Block {
 
     public static final PropertyEnum<EnumFurnacePhase> FURNACE_STATE = PropertyEnum.create("furnaceState", EnumFurnacePhase.class);
-    private TileDetonatingFurnace tile;
 
     public BlockDetonatingFurnace() {
         super(Material.ROCK);
@@ -39,31 +38,52 @@ public class BlockDetonatingFurnace extends Block {
         this.setCreativeTab(CreativeTabs.DECORATIONS);
     }
 
-
-    //TODO:Fix item doubling bug
     @Override
-    public boolean onBlockActivated(@NotNull World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
         if (!worldIn.isRemote) {
             if (playerIn.getHeldItemMainhand().getItem().getClass().equals(ItemFlintAndSteel.class)) {
-                EnumFurnaceIgnitionResult result = tile.ignite();
+                EnumFurnaceIgnitionResult result = te.ignite();
                 if (result != EnumFurnaceIgnitionResult.SUCCESS) {
                     playerIn.sendMessage(new TextComponentString(result.message));
                 }
             } else {
-                ItemStack held = playerIn.getHeldItemMainhand();
-                ItemStack result;
+                ItemStack stack = playerIn.getHeldItemMainhand();
+                int size = stack.getCount();
                 if (facing == EnumFacing.UP) {
-                    result = tile.insertFuel(held);
+                    stack = te.insertFuel(stack);
                 } else {
-                    result = tile.insertSmeltableItem(held);
+                    stack = te.insertSmeltableItem(stack);
                 }
-                if (result.equals(held)) {
-                    playerIn.setHeldItem(EnumHand.MAIN_HAND, result);
+                if (size != stack.getCount()) {
+                    playerIn.setHeldItem(EnumHand.MAIN_HAND, stack);
                 }
             }
+            playerIn.sendMessage(new TextComponentString(te.items.serializeNBT().toString()));
         }
-        playerIn.sendMessage(new TextComponentString(tile.items.serializeNBT().toString()));
         return true;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
+        for (int i = 0; i < te.items.getSlots(); i++) {
+            EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, te.items.extractItem(i, 64, true));
+
+            // Apply some random motion to the item
+            float multiplier = 0.1f;
+            float motionX = worldIn.rand.nextFloat() - 0.5f;
+            float motionY = worldIn.rand.nextFloat() - 0.5f;
+            float motionZ = worldIn.rand.nextFloat() - 0.5f;
+
+            item.motionX = motionX * multiplier;
+            item.motionY = motionY * multiplier;
+            item.motionZ = motionZ * multiplier;
+
+            // Spawn the item in the world
+            worldIn.spawnEntity(item);
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 
     @Override
@@ -74,8 +94,7 @@ public class BlockDetonatingFurnace extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
-        tile = new TileDetonatingFurnace();
-        return tile;
+        return new TileDetonatingFurnace();
     }
 
     @SideOnly(Side.CLIENT)
