@@ -51,7 +51,7 @@
           "east": "firstmod:blocks/detonatingfurnace_p2_side"
         }
       },
-      "phase_2:": {
+      "phase_2": {
         "textures": {
           "up": "firstmod:blocks/detonatingfurnace_p3_up",
           "down": "firstmod:blocks/detonatingfurnace_bottom",
