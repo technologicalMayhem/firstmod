@@ -3,11 +3,11 @@ package technologicalmayhem.firstmod.util;
 import net.minecraft.util.IStringSerializable;
 
 public enum EnumFurnacePhase implements IStringSerializable {
-    INACTIVE(0f),
-    ACTIVE(0f),
-    PHASE1(0.5f),
-    PHASE2(0.8f),
-    PHASE3(1f);
+    INACTIVE(1f),
+    ACTIVE(1f),
+    PHASE_1(0.5f),
+    PHASE_2(0.2f),
+    PHASE_3(0f);
 
     public Float percentage = 0f;
 
@@ -20,12 +20,12 @@ public enum EnumFurnacePhase implements IStringSerializable {
             case INACTIVE:
                 return ACTIVE;
             case ACTIVE:
-                return PHASE1;
-            case PHASE1:
-                return PHASE2;
-            case PHASE2:
-            case PHASE3:
-                return PHASE3;
+                return PHASE_1;
+            case PHASE_1:
+                return PHASE_2;
+            case PHASE_2:
+            case PHASE_3:
+                return PHASE_3;
             default:
                 return INACTIVE;
         }
@@ -33,6 +33,6 @@ public enum EnumFurnacePhase implements IStringSerializable {
 
     @Override
     public String getName() {
-        return this.name();
+        return this.name().toLowerCase();
     }
 }

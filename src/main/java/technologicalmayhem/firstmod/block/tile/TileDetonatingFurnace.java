@@ -4,16 +4,22 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
-import technologicalmayhem.firstmod.block.BlockDetonatingFurnace;
+import technologicalmayhem.firstmod.FirstMod;
 import technologicalmayhem.firstmod.util.EnumFurnaceIgnitionResult;
 import technologicalmayhem.firstmod.util.EnumFurnacePhase;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
@@ -21,7 +27,8 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     private int remainingTime = 0;
     private int nextPhase = 0;
     private int warningCooldown = 0;
-    private EnumFurnacePhase phase = EnumFurnacePhase.INACTIVE;
+    public boolean isDone = false;
+    public EnumFurnacePhase phase = EnumFurnacePhase.INACTIVE;
     public ItemStackHandler items = new ItemStackHandler(9) {
         @Nonnull
         @Override
@@ -47,8 +54,14 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
             if (warningCooldown > 0) warningCooldown--;
             if (phase != EnumFurnacePhase.INACTIVE) {
                 remainingTime--;
-                if (remainingTime <= nextPhase) advancePhase();
+                if (remainingTime < nextPhase) advancePhase();
             }
+        }
+    }
+
+    private void createParticles() {
+        if (phase == EnumFurnacePhase.ACTIVE) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() - 0.5f, pos.getY(), pos.getZ() - 0.5f, 0, 1, 0);
         }
     }
 
@@ -71,7 +84,9 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
         if (required == fuel || warningCooldown > 0) {
             advancePhase();
-            remainingTime = (int) Math.round(fuel * (1 - (1.1 * fuel / (fuel + 200))));
+            FirstMod.logger.info(fuel);
+            remainingTime = (int) Math.round(fuel * (1 - (1.1 * fuel / (fuel + 200 * 20))));
+            FirstMod.logger.info("Cooktime: " + remainingTime);
             totalTime = remainingTime;
             return EnumFurnaceIgnitionResult.SUCCESS;
         } else if (required < fuel) {
@@ -96,26 +111,28 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
     public void detonate() {
         if (world.isRemote) {
-            //TODO: Render detonation
+            createParticles();
         } else {
+            isDone = true;
             world.destroyBlock(pos, false);
         }
     }
 
     public void advancePhase() {
-        phase = phase.getNextPhase();
-        nextPhase = Math.round(totalTime * phase.percentage);
-        IBlockState state = world.getBlockState(pos);
-        if (state.getBlock().getClass() == BlockDetonatingFurnace.class) {
-            world.setBlockState(pos, state.withProperty(BlockDetonatingFurnace.FURNACE_STATE, phase));
+        if (phase == EnumFurnacePhase.PHASE_3) {
+            FirstMod.logger.info("Furnace is done");
+            detonate();
         }
+        phase = phase.getNextPhase();
+        FirstMod.logger.info("New phase: " + phase);
+        nextPhase = Math.round(totalTime * phase.percentage);
         world.markBlockRangeForRenderUpdate(pos, pos);
-        //Is this right? Should oldState and newState be like this?
         world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
         world.scheduleBlockUpdate(pos, this.getBlockType(), 0, 0);
         markDirty();
     }
 
+    //TODO: Fix bug returning wrong amount
     public NonNullList<ItemStack> getSmeltingResults() {
         NonNullList<ItemStack> result = NonNullList.create();
         for (int i = 0; i < 8; i++) {
@@ -140,6 +157,38 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         phase = EnumFurnacePhase.valueOf(compound.getString("phase"));
         items.deserializeNBT(compound.getCompoundTag("items"));
         nextPhase = Math.round(totalTime * phase.percentage);
+    }
+
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        NBTTagCompound nbtTag = new NBTTagCompound();
+        nbtTag.setString("phase", phase.name());
+        return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        NBTTagCompound tag = pkt.getNbtCompound();
+        phase = EnumFurnacePhase.valueOf(tag.getString("phase"));
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        NBTTagCompound tag = super.getUpdateTag();
+        tag.setString("phase", phase.name());
+        return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        phase = EnumFurnacePhase.valueOf(tag.getString("phase"));
+        super.handleUpdateTag(tag);
+    }
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+        return oldState.getBlock() != newState.getBlock();
     }
 
     private boolean isFuel(ItemStack stack) {

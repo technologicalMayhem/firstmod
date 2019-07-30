@@ -4,7 +4,7 @@
     "particle": "firstmod:blocks/detonatingfurnace_side",
     "up": "firstmod:blocks/detonatingfurnace_top",
     "down": "firstmod:blocks/detonatingfurnace_bottom",
-    "north": "firstmod:blocks/detonatingfurnace_front",
+    "north": "firstmod:blocks/detonatingfurnace_side",
     "south": "firstmod:blocks/detonatingfurnace_side",
     "east": "firstmod:blocks/detonatingfurnace_side",
     "west": "firstmod:blocks/detonatingfurnace_side"

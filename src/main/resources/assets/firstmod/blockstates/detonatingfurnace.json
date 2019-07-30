@@ -9,6 +9,68 @@
     ],
     "inventory": [
       {}
-    ]
+    ],
+    "facing": {
+      "north": {},
+      "east": {
+        "y": 90
+      },
+      "south": {
+        "y": 180
+      },
+      "west": {
+        "y": 270
+      }
+    },
+    "furnacestate": {
+      "inactive": {
+        "textures": {
+          "up": "firstmod:blocks/detonatingfurnace_p0_up",
+          "down": "firstmod:blocks/detonatingfurnace_bottom",
+          "side": "firstmod:blocks/detonatingfurnace_p0_side",
+          "north": "firstmod:blocks/detonatingfurnace_p0_front"
+        }
+      },
+      "active": {
+        "textures": {
+          "up": "firstmod:blocks/detonatingfurnace_p1_up",
+          "down": "firstmod:blocks/detonatingfurnace_bottom",
+          "north": "firstmod:blocks/detonatingfurnace_p1_front",
+          "west": "firstmod:blocks/detonatingfurnace_p1_side",
+          "south": "firstmod:blocks/detonatingfurnace_p1_side",
+          "east": "firstmod:blocks/detonatingfurnace_p1_side"
+        }
+      },
+      "phase_1": {
+        "textures": {
+          "up": "firstmod:blocks/detonatingfurnace_p2_up",
+          "down": "firstmod:blocks/detonatingfurnace_bottom",
+          "north": "firstmod:blocks/detonatingfurnace_p2_front",
+          "west": "firstmod:blocks/detonatingfurnace_p2_side",
+          "south": "firstmod:blocks/detonatingfurnace_p2_side",
+          "east": "firstmod:blocks/detonatingfurnace_p2_side"
+        }
+      },
+      "phase_2:": {
+        "textures": {
+          "up": "firstmod:blocks/detonatingfurnace_p3_up",
+          "down": "firstmod:blocks/detonatingfurnace_bottom",
+          "north": "firstmod:blocks/detonatingfurnace_p3_front",
+          "west": "firstmod:blocks/detonatingfurnace_p3_side",
+          "south": "firstmod:blocks/detonatingfurnace_p3_side",
+          "east": "firstmod:blocks/detonatingfurnace_p3_side"
+        }
+      },
+      "phase_3": {
+        "textures": {
+          "up": "firstmod:blocks/detonatingfurnace_p4_up",
+          "down": "firstmod:blocks/detonatingfurnace_bottom",
+          "north": "firstmod:blocks/detonatingfurnace_p4_front",
+          "west": "firstmod:blocks/detonatingfurnace_p4_side",
+          "south": "firstmod:blocks/detonatingfurnace_p4_side",
+          "east": "firstmod:blocks/detonatingfurnace_p4_side"
+        }
+      }
+    }
   }
 }
