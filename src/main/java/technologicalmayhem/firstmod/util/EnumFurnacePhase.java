@@ -4,12 +4,12 @@ import net.minecraft.util.IStringSerializable;
 
 public enum EnumFurnacePhase implements IStringSerializable {
     INACTIVE(1f),
-    ACTIVE(1f),
-    PHASE_1(0.5f),
+    ACTIVE(0.6f),
+    PHASE_1(0.4f),
     PHASE_2(0.2f),
-    PHASE_3(0f);
+    PHASE_3(0.1f);
 
-    public Float percentage = 0f;
+    public Float percentage;
 
     EnumFurnacePhase(Float percentage) {
         this.percentage = percentage;

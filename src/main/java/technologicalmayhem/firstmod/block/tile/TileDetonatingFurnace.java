@@ -14,7 +14,6 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
-import technologicalmayhem.firstmod.FirstMod;
 import technologicalmayhem.firstmod.util.EnumFurnaceIgnitionResult;
 import technologicalmayhem.firstmod.util.EnumFurnacePhase;
 
@@ -49,19 +48,33 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     @Override
     public void update() {
         if (world.isRemote) {
-            //TODO: Add rendering stuff
+            burningParticles();
         } else {
             if (warningCooldown > 0) warningCooldown--;
             if (phase != EnumFurnacePhase.INACTIVE) {
+                markDirty();
                 remainingTime--;
                 if (remainingTime < nextPhase) advancePhase();
             }
         }
     }
 
-    private void createParticles() {
-        if (phase == EnumFurnacePhase.ACTIVE) {
-            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() - 0.5f, pos.getY(), pos.getZ() - 0.5f, 0, 1, 0);
+    private void burningParticles() {
+        EnumFurnacePhase phaseA = EnumFurnacePhase.ACTIVE;
+        EnumFurnacePhase phase1 = EnumFurnacePhase.PHASE_1;
+        EnumFurnacePhase phase2 = EnumFurnacePhase.PHASE_2;
+        EnumFurnacePhase phase3 = EnumFurnacePhase.PHASE_3;
+
+        if (phase == phaseA || phase == phase1) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX(), pos.getY(), pos.getZ(), 0, 0.2, 0);
+        }
+        if (phase == phase2 || phase == phase3) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX(), pos.getY(), pos.getZ(), 0, 0.2, 0);
+        }
+        if ((phase == phase1 && remainingTime % 40 == 0) ||
+                (phase == phase2 && remainingTime % 20 == 0) ||
+                (phase == phase3 && remainingTime % 5 == 0)) {
+            world.spawnParticle(EnumParticleTypes.LAVA, pos.getX() - 0.5f, pos.getY(), pos.getZ() - 0.5f, 0, 0.2, 0);
         }
     }
 
@@ -83,11 +96,10 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         int fuel = calculateFuelAmount();
 
         if (required == fuel || warningCooldown > 0) {
-            advancePhase();
-            FirstMod.logger.info(fuel);
-            remainingTime = (int) Math.round(fuel * (1 - (1.1 * fuel / (fuel + 200 * 20))));
-            FirstMod.logger.info("Cooktime: " + remainingTime);
+            remainingTime = (int) Math.round(required * (1 - (1.1 * required / (required + 200 * 20))));
             totalTime = remainingTime;
+            advancePhase();
+            markDirty();
             return EnumFurnaceIgnitionResult.SUCCESS;
         } else if (required < fuel) {
             warningCooldown = 1000;
@@ -111,7 +123,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
     public void detonate() {
         if (world.isRemote) {
-            createParticles();
+            burningParticles();
         } else {
             isDone = true;
             world.destroyBlock(pos, false);
@@ -120,15 +132,11 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
     public void advancePhase() {
         if (phase == EnumFurnacePhase.PHASE_3) {
-            FirstMod.logger.info("Furnace is done");
             detonate();
         }
         phase = phase.getNextPhase();
-        FirstMod.logger.info("New phase: " + phase);
         nextPhase = Math.round(totalTime * phase.percentage);
-        world.markBlockRangeForRenderUpdate(pos, pos);
         world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
-        world.scheduleBlockUpdate(pos, this.getBlockType(), 0, 0);
         markDirty();
     }
 
@@ -143,6 +151,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
+        compound.setInteger("totalTime", totalTime);
         compound.setInteger("remainingTime", remainingTime);
         compound.setString("phase", phase.name());
         compound.setTag("items", items.serializeNBT());
@@ -152,6 +161,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
+        totalTime = compound.getInteger("totalTime");
         remainingTime = compound.getInteger("remainingTime");
         phase = EnumFurnacePhase.valueOf(compound.getString("phase"));
         items.deserializeNBT(compound.getCompoundTag("items"));
@@ -170,6 +180,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         NBTTagCompound tag = pkt.getNbtCompound();
         phase = EnumFurnacePhase.valueOf(tag.getString("phase"));
+        world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
     }
 
     @Override

@@ -46,7 +46,7 @@ public class BlockDetonatingFurnace extends Block {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
-        if (!worldIn.isRemote) {
+        if (!worldIn.isRemote && te.phase == EnumFurnacePhase.INACTIVE) {
             if (playerIn.getHeldItemMainhand().getItem().getClass().equals(ItemFlintAndSteel.class)) {
                 EnumFurnaceIgnitionResult result = te.ignite();
                 if (result != EnumFurnaceIgnitionResult.SUCCESS) {
@@ -64,39 +64,38 @@ public class BlockDetonatingFurnace extends Block {
                     playerIn.setHeldItem(EnumHand.MAIN_HAND, stack);
                 }
             }
-            //For debug TODO: Remove later
-            FirstMod.logger.info(te.items.serializeNBT().toString());
         }
         return true;
     }
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
-        NonNullList<ItemStack> items;
-        if (te.isDone) {
-            items = te.getSmeltingResults();
-        } else {
-            items = NonNullList.<ItemStack>withSize(te.items.getSlots(), ItemStack.EMPTY);
-            for (int i = 0; i < te.items.getSlots(); i++) {
-                items.add(te.items.extractItem(i, 64, true));
+        if (!worldIn.isRemote) {
+            TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
+            NonNullList<ItemStack> items = NonNullList.create();
+            if (te.isDone) {
+                items = te.getSmeltingResults();
+            } else {
+                for (int i = 0; i < te.items.getSlots(); i++) {
+                    items.add(te.items.extractItem(i, 64, true));
+                }
             }
-        }
-        for (int i = 0; i < items.size(); i++) {
-            EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, items.get(i));
+            for (int i = 0; i < items.size(); i++) {
+                EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, items.get(i));
 
-            // Apply some random motion to the item
-            float multiplier = 0.1f;
-            float motionX = worldIn.rand.nextFloat() - 0.5f;
-            float motionY = worldIn.rand.nextFloat() - 0.5f;
-            float motionZ = worldIn.rand.nextFloat() - 0.5f;
+                // Apply some random motion to the item
+                float multiplier = 0.1f;
+                float motionX = worldIn.rand.nextFloat() - 0.5f;
+                float motionY = worldIn.rand.nextFloat() - 0.5f;
+                float motionZ = worldIn.rand.nextFloat() - 0.5f;
 
-            item.motionX = motionX * multiplier;
-            item.motionY = motionY * multiplier;
-            item.motionZ = motionZ * multiplier;
+                item.motionX = motionX * multiplier;
+                item.motionY = motionY * multiplier;
+                item.motionZ = motionZ * multiplier;
 
-            // Spawn the item in the world
-            worldIn.spawnEntity(item);
+                // Spawn the item in the world
+                worldIn.spawnEntity(item);
+            }
         }
         super.breakBlock(worldIn, pos, state);
     }
