@@ -132,7 +132,6 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         markDirty();
     }
 
-    //TODO: Fix bug returning wrong amount
     public NonNullList<ItemStack> getSmeltingResults() {
         NonNullList<ItemStack> result = NonNullList.create();
         for (int i = 0; i < 8; i++) {
@@ -204,6 +203,8 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     }
 
     private ItemStack getSmeltingResult(ItemStack stack) {
-        return FurnaceRecipes.instance().getSmeltingResult(stack);
+        ItemStack result = FurnaceRecipes.instance().getSmeltingResult(stack);
+        result.setCount(stack.getCount());
+        return result;
     }
 }
