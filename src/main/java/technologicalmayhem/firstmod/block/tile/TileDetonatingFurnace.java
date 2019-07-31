@@ -62,6 +62,8 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         }
     }
 
+    //All the Rendering stuff goes here
+
     private void burningParticles() {
         EnumFurnacePhase phaseI = EnumFurnacePhase.INACTIVE;
         EnumFurnacePhase phaseA = EnumFurnacePhase.ACTIVE;
@@ -69,7 +71,12 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         EnumFurnacePhase phase2 = EnumFurnacePhase.PHASE_2;
         EnumFurnacePhase phase3 = EnumFurnacePhase.PHASE_3;
 
-        //Small smoke
+        smallSmoke(phaseA, phase1, phase2, phase3);
+        frontBurn(phaseI, phase3);
+        fullBurn(phase3);
+    }
+
+    private void smallSmoke(EnumFurnacePhase phaseA, EnumFurnacePhase phase1, EnumFurnacePhase phase2, EnumFurnacePhase phase3) {
         if (phase.equals(phaseA) || phase.equals(phase1)) {
             world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0.05, 0);
         }
@@ -83,7 +90,9 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
                 (phase.equals(phase3))) {
             world.spawnParticle(EnumParticleTypes.LAVA, pos.getX() + 0.5f, pos.getY() + 1, pos.getZ() + 0.5f, 0, 0.1, 0);
         }
-        //Front Burn
+    }
+
+    private void frontBurn(EnumFurnacePhase phaseI, EnumFurnacePhase phase3) {
         if (!phase.equals(phaseI) && !phase.equals(phase3) && (remainingTime % 5) == 0) {
             EnumFacing enumfacing = world.getBlockState(pos).getValue(BlockHorizontal.FACING);
             double x = (double) pos.getX() + 0.5D;
@@ -107,9 +116,14 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
                 case SOUTH:
                     world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + d3, y, z + 0.52D, 0.0D, 0.0D, 0.0D);
                     world.spawnParticle(EnumParticleTypes.FLAME, x + d3, y, z + 0.52D, 0.0D, 0.0D, 0.0D);
+                    break;
+                default:
+                    break;
             }
         }
-        //Full Burn
+    }
+
+    private void fullBurn(EnumFurnacePhase phase3) {
         if (phase.equals(phase3)) {
             for (EnumFacing side : EnumFacing.values()) {
                 if (!world.getBlockState(pos.offset(side)).isFullBlock()) {
@@ -145,11 +159,16 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
                         case DOWN:
                             world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + offset, z + r2, 0.0D, 0.0D, 0.0D);
                             world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + offset, z + r2, 0.0D, 0.0D, 0.0D);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
         }
     }
+
+    //Rendering stuff ends here
 
     public ItemStack insertSmeltableItem(ItemStack item) {
         int size = item.getCount();
