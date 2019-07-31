@@ -85,7 +85,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         }
         //Front Burn
         if (!phase.equals(phaseI) && !phase.equals(phase3) && (remainingTime % 5) == 0) {
-            EnumFacing enumfacing = (EnumFacing) world.getBlockState(pos).getValue(BlockHorizontal.FACING);
+            EnumFacing enumfacing = world.getBlockState(pos).getValue(BlockHorizontal.FACING);
             double x = (double) pos.getX() + 0.5D;
             double y = (double) pos.getY() + world.rand.nextDouble() * 6.0D / 16.0D + (2.0D / 16.0D);
             double z = (double) pos.getZ() + 0.5D;
@@ -118,29 +118,29 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
                     double z = (double) pos.getZ();
                     double r1 = world.rand.nextDouble();
                     double r2 = world.rand.nextDouble();
-                    double offset = 0.025D;
+                    double offset = 0.05D;
 
 
                     switch (side) {
                         case WEST:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + offset + 1.0D, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + offset + 1.0D, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case EAST:
                             world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x - offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
                             world.spawnParticle(EnumParticleTypes.FLAME, x - offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
                             break;
-                        case EAST:
-                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
-                            world.spawnParticle(EnumParticleTypes.FLAME, x + offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
-                            break;
                         case NORTH:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + r2, z + offset + 1.0D, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + r2, z + offset + 1.0D, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case SOUTH:
                             world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + r2, z - offset, 0.0D, 0.0D, 0.0D);
                             world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + r2, z - offset, 0.0D, 0.0D, 0.0D);
                             break;
-                        case SOUTH:
-                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + r2, z + offset, 0.0D, 0.0D, 0.0D);
-                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + r2, z + offset, 0.0D, 0.0D, 0.0D);
-                            break;
                         case UP:
-                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y - offset, z + r2, 0.0D, 0.0D, 0.0D);
-                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y - offset, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y - offset + 1.0D, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y - offset + 1.0D, z + r2, 0.0D, 0.0D, 0.0D);
                             break;
                         case DOWN:
                             world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + offset, z + r2, 0.0D, 0.0D, 0.0D);
