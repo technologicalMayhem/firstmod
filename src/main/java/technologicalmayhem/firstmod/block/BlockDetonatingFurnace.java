@@ -15,7 +15,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
@@ -50,21 +52,15 @@ public class BlockDetonatingFurnace extends Block {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
-        if (te.phase == EnumFurnacePhase.INACTIVE) {
+        if (!worldIn.isRemote && te.phase == EnumFurnacePhase.INACTIVE) {
             if (playerIn.getHeldItemMainhand().getItem().getClass().equals(ItemFlintAndSteel.class)) {
                 EnumFurnaceIgnitionResult result = te.ignite();
-                if (!worldIn.isRemote) {
-                    if (result == EnumFurnaceIgnitionResult.SUCCESS) {
-                        playerIn.getHeldItemMainhand().damageItem(1, playerIn);
-                    } else {
-                        playerIn.sendMessage(new TextComponentString(result.message));
-                    }
+                if (result == EnumFurnaceIgnitionResult.SUCCESS) {
+                    playerIn.getHeldItemMainhand().damageItem(1, playerIn);
+                } else {
+                    playerIn.sendMessage(new TextComponentString(result.message));
                 }
-                if (result == EnumFurnaceIgnitionResult.SUCCESS && worldIn.isRemote) {
-                    SoundEvent soundEvent = SoundEvent.REGISTRY.getObject(new ResourceLocation("minecraft", "item.flintandsteel.use"));
-                    worldIn.playSound(pos.getX(), pos.getY(), pos.getZ(), soundEvent, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
-                }
-            } else if (!worldIn.isRemote) {
+            } else {
                 ItemStack stack = playerIn.getHeldItemMainhand();
                 int size = stack.getCount();
                 if (facing == EnumFacing.UP) {
