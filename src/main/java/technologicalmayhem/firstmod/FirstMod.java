@@ -3,7 +3,6 @@ package technologicalmayhem.firstmod;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
@@ -21,10 +20,5 @@ public class FirstMod {
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         GameRegistry.registerTileEntity(TileDetonatingFurnace.class, new ResourceLocation(MODID, "tileDetonatingFurnace"));
-    }
-
-    @EventHandler
-    public void init(FMLInitializationEvent event) {
-
     }
 }
