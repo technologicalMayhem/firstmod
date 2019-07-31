@@ -43,7 +43,6 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
             markDirty();
         }
     };
-    private ItemStack itemIn;
 
     @Override
     public void update() {
@@ -172,7 +171,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     //Rendering stuff ends here
 
     public ItemStack insertSmeltableItem(ItemStack item) {
-        itemIn = item;
+        ItemStack itemIn = item;
         int size = itemIn.getCount();
         for (int i = 0; i < 8; i++) {
             itemIn = items.insertItem(i, itemIn, false);
