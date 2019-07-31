@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "cfc",
+    "sss"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "c": {
+      "item": "minecraft:cobblestone"
+    },
+    "f": {
+      "item": "minecraft:furnace"
+    },
+    "s": {
+      "item": "minecraft:stone_slab",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "firstmod:detonatingfurnace"
+  }
+}

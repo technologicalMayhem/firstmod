@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "particle": "firstmod:blocks/detonatingfurnace_p0_side",
+    "up": "firstmod:blocks/detonatingfurnace_p0_up",
+    "down": "firstmod:blocks/detonatingfurnace_bottom",
+    "north": "firstmod:blocks/detonatingfurnace_p0_front",
+    "south": "firstmod:blocks/detonatingfurnace_p0_side",
+    "east": "firstmod:blocks/detonatingfurnace_p0_side",
+    "west": "firstmod:blocks/detonatingfurnace_p0_side"
+  }
+}

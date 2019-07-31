@@ -8,8 +8,7 @@ import technologicalmayhem.firstmod.ModBlocks;
 import technologicalmayhem.firstmod.ModItems;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
-public class ClientProxy extends CommonProxy
-{
+public class ClientProxy extends CommonProxy {
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
         ModBlocks.initModels();

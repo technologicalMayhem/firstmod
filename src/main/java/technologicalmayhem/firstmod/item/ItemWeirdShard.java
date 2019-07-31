@@ -10,11 +10,10 @@ import technologicalmayhem.firstmod.FirstMod;
 
 public class ItemWeirdShard extends Item {
 
-    public ItemWeirdShard()
-    {
+    public ItemWeirdShard() {
         this.setMaxStackSize(64);
         this.setCreativeTab(CreativeTabs.MISC);
-        this.setUnlocalizedName( FirstMod.MODID + ".weirdshard");
+        this.setUnlocalizedName(FirstMod.MODID + ".weirdshard");
         this.setRegistryName("weirdshard");
     }
 
