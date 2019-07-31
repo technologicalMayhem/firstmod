@@ -1,5 +1,6 @@
 package technologicalmayhem.firstmod.block.tile;
 
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -8,9 +9,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
@@ -47,34 +46,108 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
     @Override
     public void update() {
+        if (phase != EnumFurnacePhase.INACTIVE) remainingTime--;
+        if (remainingTime < 0 && phase == EnumFurnacePhase.PHASE_3) {
+            detonate();
+            return;
+        }
         if (world.isRemote) {
             burningParticles();
         } else {
             if (warningCooldown > 0) warningCooldown--;
             if (phase != EnumFurnacePhase.INACTIVE) {
                 markDirty();
-                remainingTime--;
                 if (remainingTime < nextPhase) advancePhase();
             }
         }
     }
 
     private void burningParticles() {
+        EnumFurnacePhase phaseI = EnumFurnacePhase.INACTIVE;
         EnumFurnacePhase phaseA = EnumFurnacePhase.ACTIVE;
         EnumFurnacePhase phase1 = EnumFurnacePhase.PHASE_1;
         EnumFurnacePhase phase2 = EnumFurnacePhase.PHASE_2;
         EnumFurnacePhase phase3 = EnumFurnacePhase.PHASE_3;
 
-        if (phase == phaseA || phase == phase1) {
-            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX(), pos.getY(), pos.getZ(), 0, 0.2, 0);
+        //Small smoke
+        if (phase.equals(phaseA) || phase.equals(phase1)) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0.05, 0);
         }
-        if (phase == phase2 || phase == phase3) {
-            world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX(), pos.getY(), pos.getZ(), 0, 0.2, 0);
+        //Big smoke
+        if (phase.equals(phase2) || phase.equals(phase3)) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0.1, 0);
         }
-        if ((phase == phase1 && remainingTime % 40 == 0) ||
-                (phase == phase2 && remainingTime % 20 == 0) ||
-                (phase == phase3 && remainingTime % 5 == 0)) {
-            world.spawnParticle(EnumParticleTypes.LAVA, pos.getX() - 0.5f, pos.getY(), pos.getZ() - 0.5f, 0, 0.2, 0);
+        //Lava particles
+        if ((phase.equals(phase1) && (remainingTime % 10) == 0) ||
+                (phase.equals(phase2) && (remainingTime % 5) == 0) ||
+                (phase.equals(phase3))) {
+            world.spawnParticle(EnumParticleTypes.LAVA, pos.getX() + 0.5f, pos.getY() + 1, pos.getZ() + 0.5f, 0, 0.1, 0);
+        }
+        //Front Burn
+        if (!phase.equals(phaseI) && !phase.equals(phase3) && (remainingTime % 5) == 0) {
+            EnumFacing enumfacing = (EnumFacing) world.getBlockState(pos).getValue(BlockHorizontal.FACING);
+            double x = (double) pos.getX() + 0.5D;
+            double y = (double) pos.getY() + world.rand.nextDouble() * 6.0D / 16.0D + (2.0D / 16.0D);
+            double z = (double) pos.getZ() + 0.5D;
+            double d3 = world.rand.nextDouble() * 0.6D - 0.3D;
+
+            switch (enumfacing) {
+                case WEST:
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x - 0.52D, y, z + d3, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, x - 0.52D, y, z + d3, 0.0D, 0.0D, 0.0D);
+                    break;
+                case EAST:
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + 0.52D, y, z + d3, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, x + 0.52D, y, z + d3, 0.0D, 0.0D, 0.0D);
+                    break;
+                case NORTH:
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + d3, y, z - 0.52D, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, x + d3, y, z - 0.52D, 0.0D, 0.0D, 0.0D);
+                    break;
+                case SOUTH:
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + d3, y, z + 0.52D, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, x + d3, y, z + 0.52D, 0.0D, 0.0D, 0.0D);
+            }
+        }
+        //Full Burn
+        if (phase.equals(phase3)) {
+            for (EnumFacing side : EnumFacing.values()) {
+                if (!world.getBlockState(pos.offset(side)).isFullBlock()) {
+                    double x = (double) pos.getX();
+                    double y = (double) pos.getY();
+                    double z = (double) pos.getZ();
+                    double r1 = world.rand.nextDouble();
+                    double r2 = world.rand.nextDouble();
+                    double offset = 0.025D;
+
+
+                    switch (side) {
+                        case WEST:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x - offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x - offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case EAST:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + offset, y + r1, z + r2, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case NORTH:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + r2, z - offset, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + r2, z - offset, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case SOUTH:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + r2, z + offset, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + r2, z + offset, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case UP:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y - offset, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y - offset, z + r2, 0.0D, 0.0D, 0.0D);
+                            break;
+                        case DOWN:
+                            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + r1, y + offset, z + r2, 0.0D, 0.0D, 0.0D);
+                            world.spawnParticle(EnumParticleTypes.FLAME, x + r1, y + offset, z + r2, 0.0D, 0.0D, 0.0D);
+                    }
+                }
+            }
         }
     }
 
@@ -98,6 +171,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         if (required == fuel || warningCooldown > 0) {
             remainingTime = (int) Math.round(required * (1 - (1.1 * required / (required + 200 * 20))));
             totalTime = remainingTime;
+
             advancePhase();
             markDirty();
             return EnumFurnaceIgnitionResult.SUCCESS;
@@ -123,7 +197,9 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
 
     public void detonate() {
         if (world.isRemote) {
-            burningParticles();
+            world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0);
+            SoundEvent soundEvent = SoundEvent.REGISTRY.getObject(new ResourceLocation("minecraft", "entity.generic.explode"));
+            world.playSound(pos.getX(), pos.getY(), pos.getZ(), soundEvent, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
         } else {
             isDone = true;
             world.destroyBlock(pos, false);
@@ -131,9 +207,6 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     }
 
     public void advancePhase() {
-        if (phase == EnumFurnacePhase.PHASE_3) {
-            detonate();
-        }
         phase = phase.getNextPhase();
         nextPhase = Math.round(totalTime * phase.percentage);
         world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
@@ -173,6 +246,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
         nbtTag.setString("phase", phase.name());
+        nbtTag.setInteger("remainingTime", remainingTime);
         return new SPacketUpdateTileEntity(getPos(), 1, nbtTag);
     }
 
@@ -180,6 +254,7 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         NBTTagCompound tag = pkt.getNbtCompound();
         phase = EnumFurnacePhase.valueOf(tag.getString("phase"));
+        remainingTime = tag.getInteger("remainingTime");
         world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
     }
 
@@ -187,12 +262,14 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound tag = super.getUpdateTag();
         tag.setString("phase", phase.name());
+        tag.setInteger("remainingTime", remainingTime);
         return tag;
     }
 
     @Override
     public void handleUpdateTag(NBTTagCompound tag) {
         phase = EnumFurnacePhase.valueOf(tag.getString("phase"));
+        remainingTime = tag.getInteger("remainingTime");
         super.handleUpdateTag(tag);
     }
 
