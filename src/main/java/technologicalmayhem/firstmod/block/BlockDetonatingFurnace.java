@@ -7,7 +7,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -39,8 +39,12 @@ public class BlockDetonatingFurnace extends Block {
         super(Material.ROCK);
         setUnlocalizedName(FirstMod.MODID + ".detonatingfurnace");
         setRegistryName("detonatingfurnace");
-        this.setCreativeTab(CreativeTabs.DECORATIONS);
         this.setDefaultState(getDefaultState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(FURNACE_STATE, EnumFurnacePhase.INACTIVE));
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        worldIn.setBlockState(pos, state.withProperty(BlockHorizontal.FACING, placer.getHorizontalFacing().getOpposite()), 2);
     }
 
     @Override
