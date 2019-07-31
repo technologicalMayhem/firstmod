@@ -112,6 +112,14 @@ public class BlockDetonatingFurnace extends Block {
     }
 
     @Override
+    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+        TileDetonatingFurnace te = ((TileDetonatingFurnace) world.getTileEntity(pos));
+        if (te != null) {
+            return te.phase == EnumFurnacePhase.INACTIVE ? 0 : 13;
+        } else return 0;
+    }
+
+    @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(BlockHorizontal.FACING, EnumFacing.getHorizontal(meta));
     }
