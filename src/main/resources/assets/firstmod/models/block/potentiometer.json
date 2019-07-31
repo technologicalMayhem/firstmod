@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "firstmod:blocks/firstblock"
+    "all": "firstmod:blocks/potentiometer_00"
   }
 }
