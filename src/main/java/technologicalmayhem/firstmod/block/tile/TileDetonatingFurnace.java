@@ -185,11 +185,11 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
     }
 
     public EnumFurnaceIgnitionResult ignite() {
-        int required = calculateFuelRequirement();
+        double required = calculateFuelRequirement();
         int fuel = calculateFuelAmount();
 
         if (required == fuel || warningCooldown > 0) {
-            remainingTime = (int) Math.round(required * (1 - (1.1 * required / (required + 200 * 20))));
+            remainingTime = (int) Math.round(required * (Math.pow(((required / 200) / -607), 3) + 1));
             totalTime = remainingTime;
 
             advancePhase();
