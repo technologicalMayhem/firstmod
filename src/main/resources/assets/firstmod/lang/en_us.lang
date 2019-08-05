@@ -1,6 +1,7 @@
 #Blocks
 tile.firstmod.detonatingfurnace.name=Detonating Furnace
 tile.firstmod.potentiometer.name=Potentiometer
+tile.firstmod.laserdefense.name=Laser Defense
 
 #Items
 item.firstmod.weirdshard.name=Weird Shard
