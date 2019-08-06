@@ -166,7 +166,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
         charges = compound.getInteger("charges");
         cooldown = compound.getInteger("cooldown");
         connectedSensors = compound.getInteger("connectedSensors");
-        if (!compound.getString("target").isEmpty()) target = findByUUID(UUID.fromString(compound.getString("target")));
         super.readFromNBT(compound);
     }
 
@@ -175,7 +174,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("charges", charges);
-        if (target != null) tag.setString("target", target.getPersistentID().toString());
         return new SPacketUpdateTileEntity(getPos(), 1, tag);
     }
 
