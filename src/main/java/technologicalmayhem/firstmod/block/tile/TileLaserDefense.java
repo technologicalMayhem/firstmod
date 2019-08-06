@@ -51,12 +51,14 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     }
 
     private void charge() {
-        collectedEnergy += connectedSensors;
-        if (collectedEnergy >= 800) {
-            collectedEnergy = 0;
-            if (charges < 100) {
-                charges++;
-                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+        if (world.isDaytime()) {
+            collectedEnergy += connectedSensors;
+            if (collectedEnergy >= 600) {
+                collectedEnergy = 0;
+                if (charges < 100) {
+                    charges++;
+                    world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+                }
             }
         }
     }
