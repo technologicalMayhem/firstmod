@@ -13,6 +13,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 
 import javax.annotation.Nullable;
+import javax.vecmath.Vector3d;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,9 +57,26 @@ public class TileLaserDefense extends TileEntity implements ITickable {
                 }
             }
         } else {
-            if (target != null) {
-                BlockPos position = target.getPosition().add(0, 2, 0);
-                world.spawnParticle(EnumParticleTypes.REDSTONE, position.getX(), position.getY(), position.getZ(), 0, 0, 0);
+            if (target != null && target.isEntityAlive()) {
+                //Get the difference between block and target
+                Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                Vector3d diff = new Vector3d(target.posX - blockPos.x, target.posY - blockPos.y + target.height / 2, target.posZ - blockPos.z);
+                //Find the greatest difference
+                double greatest = 0;
+                for (Double n : new Double[]{diff.x, diff.y, diff.z}) {
+                    if (Math.abs(n) > greatest) greatest = Math.abs(n);
+                }
+                //Find out how many we need to take and how much we need to move each step along the way
+                double posSteps = greatest / 0.2;
+                Vector3d step = new Vector3d(diff.x / posSteps, diff.y / posSteps, diff.z / posSteps);
+
+                Vector3d curDiff = new Vector3d();
+                for (int i = 0; i < Math.floor(posSteps); i++) {
+                    world.spawnParticle(EnumParticleTypes.REDSTONE,
+                            blockPos.x + curDiff.x, blockPos.y + curDiff.y, blockPos.z + curDiff.z,
+                            0, 0, 0);
+                    curDiff.add(step);
+                }
             }
         }
     }
