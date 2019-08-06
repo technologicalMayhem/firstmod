@@ -1,7 +1,8 @@
 package technologicalmayhem.firstmod.block.tile;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -10,7 +11,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -22,7 +22,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     int charge = 0;
     int cooldown = 20;
     int connectedSensors = 0;
-    EntityLivingBase target = null;
+    Entity target = null;
 
     @Override
     public void update() {
@@ -41,12 +41,12 @@ public class TileLaserDefense extends TileEntity implements ITickable {
                 int x = pos.getX();
                 int y = pos.getY();
                 int z = pos.getY();
-                List<EntityMob> entities = world.getEntitiesWithinAABB(EntityMob.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
+                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
                 if (!entities.isEmpty()) {
-                    EntityMob newMob = null;
+                    Entity newMob = null;
                     double distance = 20D;
-                    for (EntityMob mob : entities) {
-                        if (mob.getDistanceSq(pos) < distance) {
+                    for (Entity mob : entities) {
+                        if (mob.getDistanceSq(pos) < distance && mob instanceof IMob) {
                             newMob = mob;
                             distance = mob.getDistanceSq(pos);
                         }
@@ -94,8 +94,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
-        tag.setInteger("charge", charge);
-        tag.setInteger("cooldown", cooldown);
         if (target != null) tag.setString("target", target.getPersistentID().toString());
         return new SPacketUpdateTileEntity(getPos(), 1, tag);
     }
@@ -103,8 +101,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         NBTTagCompound tag = pkt.getNbtCompound();
-        charge = tag.getInteger("charge");
-        cooldown = tag.getInteger("cooldown");
         if (!tag.getString("target").isEmpty()) {
             target = findByUUID(UUID.fromString(tag.getString("target")));
         } else {
