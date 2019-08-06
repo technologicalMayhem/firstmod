@@ -52,7 +52,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
 
     private void charge() {
         if (world.isDaytime()) {
-            collectedEnergy += connectedSensors;
+            collectedEnergy += getValidSensors();
             if (collectedEnergy >= 600) {
                 collectedEnergy = 0;
                 if (charges < 100) {
@@ -61,6 +61,18 @@ public class TileLaserDefense extends TileEntity implements ITickable {
                 }
             }
         }
+    }
+
+    private int getValidSensors() {
+        int count = 0;
+        for (EnumFacing side : EnumFacing.HORIZONTALS) {
+            if (world.getBlockState(pos.offset(side)).getBlock() instanceof BlockDaylightDetector) {
+                if (world.canBlockSeeSky(pos.offset(side).up())) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private boolean hasValidTarget() {
@@ -116,7 +128,10 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     private void attackTarget() {
         cooldown--;
         if (cooldown == 0) {
-            target.attackEntityFrom(DamageSource.GENERIC, 3f);
+            if (!target.attackEntityFrom(DamageSource.GENERIC, 3f)) {
+                cooldown++;
+                return;
+            }
             charges--;
             cooldown = 20;
             if (target.isDead) {
@@ -125,17 +140,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
             world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
             markDirty();
         }
-    }
-
-    public void countSensors() {
-        int sensors = 0;
-        for (EnumFacing side : EnumFacing.HORIZONTALS) {
-            if (world.getBlockState(pos.offset(side)).getBlock() instanceof BlockDaylightDetector) {
-                sensors++;
-            }
-        }
-        connectedSensors = sensors;
-        markDirty();
     }
 
     private EntityMob findByUUID(UUID uuid) {
@@ -154,7 +158,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
         compound.setInteger("charges", charges);
         compound.setInteger("cooldown", cooldown);
         compound.setInteger("connectedSensory", connectedSensors);
-        if (target != null) compound.setString("target", target.getPersistentID().toString());
         return compound;
     }
 
@@ -171,6 +174,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("charges", charges);
+        if (target != null) tag.setString("target", target.getPersistentID().toString());
         return new SPacketUpdateTileEntity(getPos(), 1, tag);
     }
 
