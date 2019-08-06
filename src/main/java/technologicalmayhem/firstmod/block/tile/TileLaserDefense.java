@@ -13,7 +13,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
-import technologicalmayhem.firstmod.FirstMod;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Vector3d;
@@ -60,7 +59,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
             if (charges < 100) {
                 charges++;
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
-                FirstMod.logger.info("Generated a charge. Now: " + charges);
             }
         }
     }
@@ -123,7 +121,6 @@ public class TileLaserDefense extends TileEntity implements ITickable {
         if (cooldown == 0) {
             target.attackEntityFrom(DamageSource.GENERIC, 3f);
             charges--;
-            FirstMod.logger.info("Used a charge. Now: " + charges);
             cooldown = 20;
             if (target.isDead) {
                 target = null;
