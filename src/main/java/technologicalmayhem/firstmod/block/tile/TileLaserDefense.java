@@ -64,7 +64,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     }
 
     private boolean hasValidTarget() {
-        if (target != null && target.getDistanceSq(pos) < range && !target.isDead) {
+        if (target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && !target.isDead) {
             return true;
         }
         target = null;
@@ -95,15 +95,12 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     }
 
     private void searchForNewTarget() {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getY();
         List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
         if (!entities.isEmpty()) {
             Entity newMob = null;
-            double distance = 20D;
+            double distance = Double.MAX_VALUE;
             for (Entity mob : entities) {
-                if (mob.getDistanceSq(pos) < distance && mob instanceof IMob) {
+                if (mob.getDistance(pos.getX(), pos.getY(), pos.getZ()) < distance && mob instanceof IMob) {
                     newMob = mob;
                     distance = mob.getDistanceSq(pos);
                 }
