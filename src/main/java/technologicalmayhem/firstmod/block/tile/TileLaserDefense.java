@@ -21,12 +21,10 @@ import java.util.UUID;
 
 public class TileLaserDefense extends TileEntity implements ITickable {
 
-    //TODO: Test if counting of sensors now works properly
-
     private static final int range = 10;
     private int charges = 0;
     private int cooldown = 20;
-    public int connectedSensors = 0;
+    private int connectedSensors = 0;
     private int collectedEnergy = 0;
     private Entity target = null;
 
