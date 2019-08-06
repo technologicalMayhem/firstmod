@@ -1,5 +1,6 @@
 package technologicalmayhem.firstmod.block.tile;
 
+import net.minecraft.block.BlockDaylightDetector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.IMob;
@@ -8,9 +9,11 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
+import technologicalmayhem.firstmod.FirstMod;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Vector3d;
@@ -19,25 +22,56 @@ import java.util.UUID;
 
 public class TileLaserDefense extends TileEntity implements ITickable {
 
-    static final int range = 10;
-    int charge = 0;
-    int cooldown = 20;
-    int connectedSensors = 0;
-    Entity target = null;
+    //TODO: Test if counting of sensors now works properly
+
+    private static final int range = 10;
+    private int charges = 0;
+    private int cooldown = 20;
+    public int connectedSensors = 0;
+    private int collectedEnergy = 0;
+    private Entity target = null;
+
+    public void setConnectedSensors(int connectedSensors) {
+        this.connectedSensors = connectedSensors;
+    }
 
     @Override
     public void update() {
         if (!world.isRemote) {
-            if (target != null) {
-                attackTarget();
-            } else {
-                searchForNewTarget();
+            charge();
+            if (charges > 0) {
+                if (hasValidTarget()) {
+                    attackTarget();
+                } else {
+                    searchForNewTarget();
+                }
             }
         } else {
-            if (target != null && target.isEntityAlive()) {
+            if (charges > 0 && hasValidTarget()) {
                 doParticles();
             }
         }
+    }
+
+    private void charge() {
+        collectedEnergy += connectedSensors;
+        if (collectedEnergy >= 800) {
+            collectedEnergy = 0;
+            if (charges < 100) {
+                charges++;
+                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+                FirstMod.logger.info("Generated a charge. Now: " + charges);
+            }
+        }
+    }
+
+    private boolean hasValidTarget() {
+        if (target != null && target.getDistanceSq(pos) < range && !target.isDead) {
+            return true;
+        }
+        target = null;
+        if (!world.isRemote) markDirty();
+        return false;
     }
 
     private void doParticles() {
@@ -76,8 +110,11 @@ public class TileLaserDefense extends TileEntity implements ITickable {
                     distance = mob.getDistanceSq(pos);
                 }
             }
-            target = newMob;
-            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+            if (target != newMob) {
+                target = newMob;
+                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+                markDirty();
+            }
         }
     }
 
@@ -85,12 +122,26 @@ public class TileLaserDefense extends TileEntity implements ITickable {
         cooldown--;
         if (cooldown == 0) {
             target.attackEntityFrom(DamageSource.GENERIC, 3f);
+            charges--;
+            FirstMod.logger.info("Used a charge. Now: " + charges);
             cooldown = 20;
             if (target.isDead) {
                 target = null;
-                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+            }
+            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+            markDirty();
+        }
+    }
+
+    public void countSensors() {
+        int sensors = 0;
+        for (EnumFacing side : EnumFacing.HORIZONTALS) {
+            if (world.getBlockState(pos.offset(side)).getBlock() instanceof BlockDaylightDetector) {
+                sensors++;
             }
         }
+        connectedSensors = sensors;
+        markDirty();
     }
 
     private EntityMob findByUUID(UUID uuid) {
@@ -106,16 +157,18 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        compound.setInteger("charge", charge);
+        compound.setInteger("charges", charges);
         compound.setInteger("cooldown", cooldown);
+        compound.setInteger("connectedSensory", connectedSensors);
         if (target != null) compound.setString("target", target.getPersistentID().toString());
         return compound;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
-        charge = compound.getInteger("charge");
+        charges = compound.getInteger("charges");
         cooldown = compound.getInteger("cooldown");
+        connectedSensors = compound.getInteger("connectedSensors");
         if (!compound.getString("target").isEmpty()) target = findByUUID(UUID.fromString(compound.getString("target")));
         super.readFromNBT(compound);
     }
@@ -124,6 +177,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("charges", charges);
         if (target != null) tag.setString("target", target.getPersistentID().toString());
         return new SPacketUpdateTileEntity(getPos(), 1, tag);
     }
@@ -131,6 +185,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         NBTTagCompound tag = pkt.getNbtCompound();
+        charges = tag.getInteger("charges");
         if (!tag.getString("target").isEmpty()) {
             target = findByUUID(UUID.fromString(tag.getString("target")));
         } else {
