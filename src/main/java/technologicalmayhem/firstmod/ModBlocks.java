@@ -3,10 +3,7 @@ package technologicalmayhem.firstmod;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import technologicalmayhem.firstmod.block.BlockDetonatingFurnace;
-import technologicalmayhem.firstmod.block.BlockLaserEnergyCollector;
-import technologicalmayhem.firstmod.block.BlockLaserTurret;
-import technologicalmayhem.firstmod.block.BlockPotentiometer;
+import technologicalmayhem.firstmod.block.*;
 
 public class ModBlocks {
 
@@ -14,8 +11,10 @@ public class ModBlocks {
     public static BlockDetonatingFurnace detonatingFurnace;
     @GameRegistry.ObjectHolder("firstmod:potentiometer")
     public static BlockPotentiometer potentiometer;
-    @GameRegistry.ObjectHolder("firstmod:laserTurret")
+    @GameRegistry.ObjectHolder("firstmod:laserturret")
     public static BlockLaserTurret laserTurret;
+    @GameRegistry.ObjectHolder("firstmod:laserbase")
+    public static BlockLaserBase laserBase;
     @GameRegistry.ObjectHolder("firstmod:laserenergycollector")
     public static BlockLaserEnergyCollector laserEnergyCollector;
 
@@ -24,6 +23,7 @@ public class ModBlocks {
         detonatingFurnace.initModel();
         potentiometer.initModel();
         laserTurret.initModel();
+        laserBase.initModel();
         laserEnergyCollector.initModel();
     }
 }

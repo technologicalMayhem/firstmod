@@ -61,7 +61,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     private int getValidSensors() {
         int count = 0;
         for (EnumFacing side : EnumFacing.HORIZONTALS) {
-            if (world.getBlockState(pos.offset(side)).getBlock() instanceof BlockLaserEnergyCollector) {
+            if (world.getBlockState(pos.offset(side).down(2)).getBlock() instanceof BlockLaserEnergyCollector) {
                 if (world.canBlockSeeSky(pos.offset(side).up())) {
                     count++;
                 }
