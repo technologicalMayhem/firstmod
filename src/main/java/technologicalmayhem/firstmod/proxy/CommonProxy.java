@@ -8,8 +8,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import technologicalmayhem.firstmod.ModBlocks;
 import technologicalmayhem.firstmod.block.BlockDetonatingFurnace;
-import technologicalmayhem.firstmod.block.BlockLaserDefense;
 import technologicalmayhem.firstmod.block.BlockLaserEnergyCollector;
+import technologicalmayhem.firstmod.block.BlockLaserTurret;
 import technologicalmayhem.firstmod.block.BlockPotentiometer;
 import technologicalmayhem.firstmod.item.ItemWeirdShard;
 
@@ -20,7 +20,7 @@ public class CommonProxy {
         event.getRegistry().registerAll(
                 new BlockDetonatingFurnace(),
                 new BlockPotentiometer(),
-                new BlockLaserDefense(),
+                new BlockLaserTurret(),
                 new BlockLaserEnergyCollector()
         );
     }
@@ -32,7 +32,7 @@ public class CommonProxy {
 
         event.getRegistry().register(new ItemBlock(ModBlocks.detonatingFurnace).setRegistryName(ModBlocks.detonatingFurnace.getRegistryName()));
         event.getRegistry().register(new ItemBlock(ModBlocks.potentiometer).setRegistryName(ModBlocks.potentiometer.getRegistryName()));
-        event.getRegistry().register(new ItemBlock(ModBlocks.laserDefense).setRegistryName(ModBlocks.laserDefense.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(ModBlocks.laserTurret).setRegistryName(ModBlocks.laserTurret.getRegistryName()));
         event.getRegistry().register(new ItemBlock(ModBlocks.laserEnergyCollector).setRegistryName(ModBlocks.laserEnergyCollector.getRegistryName()));
     }
 }

@@ -12,16 +12,16 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import technologicalmayhem.firstmod.FirstMod;
-import technologicalmayhem.firstmod.block.tile.TileLaserDefense;
+import technologicalmayhem.firstmod.block.tile.TileLaserTurret;
 
 import javax.annotation.Nullable;
 
-public class BlockLaserDefense extends Block {
+public class BlockLaserTurret extends Block {
 
-    public BlockLaserDefense() {
+    public BlockLaserTurret() {
         super(Material.ROCK);
-        setUnlocalizedName(FirstMod.MODID + ".laserdefense");
-        setRegistryName("laserdefense");
+        setUnlocalizedName(FirstMod.MODID + ".laserturret");
+        setRegistryName("laserturret");
         setHardness(2.0f);
         setCreativeTab(CreativeTabs.DECORATIONS);
         setDefaultState(getDefaultState());
@@ -41,6 +41,6 @@ public class BlockLaserDefense extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
-        return new TileLaserDefense();
+        return new TileLaserTurret();
     }
 }

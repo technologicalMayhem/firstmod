@@ -19,7 +19,7 @@ import javax.vecmath.Vector3d;
 import java.util.List;
 import java.util.UUID;
 
-public class TileLaserDefense extends TileEntity implements ITickable {
+public class TileLaserTurret extends TileEntity implements ITickable {
 
     private static final int range = 10;
     private int charges = 0;
