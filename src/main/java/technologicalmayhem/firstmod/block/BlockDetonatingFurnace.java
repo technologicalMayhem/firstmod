@@ -53,7 +53,7 @@ public class BlockDetonatingFurnace extends Block {
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
         if (!worldIn.isRemote && te.phase == EnumFurnacePhase.INACTIVE) {
-            if (playerIn.getHeldItemMainhand().getItem().getClass().equals(ItemFlintAndSteel.class)) {
+            if (playerIn.getHeldItemMainhand().getItem() instanceof ItemFlintAndSteel) {
                 EnumFurnaceIgnitionResult result = te.ignite();
                 if (result == EnumFurnaceIgnitionResult.SUCCESS) {
                     playerIn.getHeldItemMainhand().damageItem(1, playerIn);

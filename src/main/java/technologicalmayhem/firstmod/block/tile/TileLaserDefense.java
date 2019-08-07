@@ -1,6 +1,5 @@
 package technologicalmayhem.firstmod.block.tile;
 
-import net.minecraft.block.BlockDaylightDetector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.IMob;
@@ -13,6 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
+import technologicalmayhem.firstmod.block.BlockLaserEnergyCollector;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Vector3d;
@@ -61,7 +61,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     private int getValidSensors() {
         int count = 0;
         for (EnumFacing side : EnumFacing.HORIZONTALS) {
-            if (world.getBlockState(pos.offset(side)).getBlock() instanceof BlockDaylightDetector) {
+            if (world.getBlockState(pos.offset(side)).getBlock() instanceof BlockLaserEnergyCollector) {
                 if (world.canBlockSeeSky(pos.offset(side).up())) {
                     count++;
                 }
@@ -71,7 +71,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     }
 
     private boolean hasValidTarget() {
-        if (target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && !target.isDead) {
+        if (target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && target.isEntityAlive()) {
             return true;
         }
         target = null;
