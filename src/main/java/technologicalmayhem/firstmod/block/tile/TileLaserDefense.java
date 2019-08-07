@@ -24,13 +24,8 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     private static final int range = 10;
     private int charges = 0;
     private int cooldown = 20;
-    private int connectedSensors = 0;
     private int collectedEnergy = 0;
     private Entity target = null;
-
-    public void setConnectedSensors(int connectedSensors) {
-        this.connectedSensors = connectedSensors;
-    }
 
     @Override
     public void update() {
@@ -157,7 +152,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
         super.writeToNBT(compound);
         compound.setInteger("charges", charges);
         compound.setInteger("cooldown", cooldown);
-        compound.setInteger("connectedSensory", connectedSensors);
+        compound.setInteger("collectedEnergy", collectedEnergy);
         return compound;
     }
 
@@ -165,7 +160,7 @@ public class TileLaserDefense extends TileEntity implements ITickable {
     public void readFromNBT(NBTTagCompound compound) {
         charges = compound.getInteger("charges");
         cooldown = compound.getInteger("cooldown");
-        connectedSensors = compound.getInteger("connectedSensors");
+        collectedEnergy = compound.getInteger("collectedEnergy");
         super.readFromNBT(compound);
     }
 
