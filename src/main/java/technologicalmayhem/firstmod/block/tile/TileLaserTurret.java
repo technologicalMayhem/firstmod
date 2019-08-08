@@ -8,7 +8,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -25,6 +24,8 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     private int charges = 0;
     private int cooldown = 20;
     private int collectedEnergy = 0;
+    private int connectedSensors = 0;
+    private int checkInterval = 0;
     private Entity target = null;
 
     @Override
@@ -47,7 +48,8 @@ public class TileLaserTurret extends TileEntity implements ITickable {
 
     private void charge() {
         if (world.isDaytime()) {
-            collectedEnergy += getValidSensors();
+            checkSensors();
+            collectedEnergy += connectedSensors;
             if (collectedEnergy >= 600) {
                 collectedEnergy = 0;
                 if (charges < 100) {
@@ -58,16 +60,21 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         }
     }
 
-    private int getValidSensors() {
-        int count = 0;
-        for (EnumFacing side : EnumFacing.HORIZONTALS) {
-            if (world.getBlockState(pos.offset(side).down(2)).getBlock() instanceof BlockLaserEnergyCollector) {
-                if (world.canBlockSeeSky(pos.offset(side).up())) {
-                    count++;
+    private void checkSensors() {
+        checkInterval--;
+        if (checkInterval >= 0) {
+            int count = 0;
+            int[][] offsets = new int[][]{{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
+            for (int[] offset : offsets) {
+                if (world.getBlockState(pos.add(offset[0], -2, offset[1])).getBlock() instanceof BlockLaserEnergyCollector) {
+                    if (world.canBlockSeeSky(pos.add(offset[0], -2, offset[1]).up())) {
+                        count++;
+                    }
                 }
             }
+            checkInterval = 100;
+            connectedSensors = count;
         }
-        return count;
     }
 
     private boolean hasValidTarget() {
