@@ -1,0 +1,43 @@
+{
+  "parent": "block/wall_post",
+  "textures": {
+    "pillar_side": "minecraft:blocks/quartz_block_lines",
+    "pillar_top": "minecraft:blocks/quartz_block_top"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        16,
+        12
+      ],
+      "faces": {
+        "down": {
+          "texture": "#pillar_top",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#pillar_top",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#pillar_side"
+        },
+        "south": {
+          "texture": "#pillar_side"
+        },
+        "west": {
+          "texture": "#pillar_side"
+        },
+        "east": {
+          "texture": "#pillar_side"
+        }
+      }
+    }
+  ]
+}

@@ -9,6 +9,14 @@
     ],
     "inventory": [
       {}
-    ]
+    ],
+    "middle": {
+      "false": {
+        "model": "firstmod:laserbase"
+      },
+      "true": {
+        "model": "firstmod:laserbase_middle"
+      }
+    }
   }
 }
