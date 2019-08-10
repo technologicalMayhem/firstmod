@@ -110,14 +110,14 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     }
 
     private void searchForNewTarget() {
-        List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
+        List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, 3, range), pos.add(-range, -3, -range)));
         if (!entities.isEmpty()) {
             Entity newMob = null;
             double distance = Double.MAX_VALUE;
             for (Entity mob : entities) {
                 if (mob.getDistance(pos.getX(), pos.getY(), pos.getZ()) < distance && mob instanceof IMob) {
                     newMob = mob;
-                    distance = mob.getDistanceSq(pos);
+                    distance = Math.sqrt(mob.getDistanceSq(pos));
                 }
             }
             if (target != newMob) {
