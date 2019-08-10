@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " b ",
+    "bsb",
+    " b "
+  ],
+  "key": {
+    "b": {
+      "item": "minecraft:blaze_powder"
+    },
+    "s": {
+      "item": "minecraft:daylight_sensor"
+    }
+  },
+  "result": {
+    "item": "firstmod:laserenergycollector"
+  }
+}

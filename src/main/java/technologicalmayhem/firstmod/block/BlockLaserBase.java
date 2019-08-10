@@ -23,7 +23,7 @@ import technologicalmayhem.firstmod.ModBlocks;
 public class BlockLaserBase extends Block {
 
     public static final PropertyBool MIDDLE = PropertyBool.create("middle");
-    protected static final AxisAlignedBB LASER_BASE_MIDDLE_AABB = new AxisAlignedBB(0.25D, 0D, 0.25D, 0.75D, 1.0D, 0.75D);
+    protected static final AxisAlignedBB LASER_BASE_MIDDLE_AABB = new AxisAlignedBB(0.0625D, 0D, 0.0625D, 0.9375D, 1.0D, 0.9375D);
 
     public BlockLaserBase() {
         super(Material.ROCK);

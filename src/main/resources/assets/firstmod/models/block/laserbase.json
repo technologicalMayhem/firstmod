@@ -1,6 +1,12 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "minecraft:blocks/concrete_black"
+    "particle": "firstmod:blocks/laserturret/laserbase_side",
+    "north": "firstmod:blocks/laserturret/laserbase_side",
+    "west": "firstmod:blocks/laserturret/laserbase_side",
+    "south": "firstmod:blocks/laserturret/laserbase_side",
+    "east": "firstmod:blocks/laserturret/laserbase_side",
+    "up": "firstmod:blocks/laserturret/laserbase_top",
+    "down": "minecraft:blocks/stone_slab_top"
   }
 }
