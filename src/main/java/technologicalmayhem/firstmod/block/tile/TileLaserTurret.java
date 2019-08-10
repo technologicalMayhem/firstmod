@@ -97,7 +97,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
             if (Math.abs(n) > greatest) greatest = Math.abs(n);
         }
         //Find out how many we need to take and how much we need to move each step along the way
-        double posSteps = greatest / 0.2;
+        double posSteps = greatest / 0.1;
         Vector3d step = new Vector3d(diff.x / posSteps, diff.y / posSteps, diff.z / posSteps);
 
         Vector3d curDiff = new Vector3d();
