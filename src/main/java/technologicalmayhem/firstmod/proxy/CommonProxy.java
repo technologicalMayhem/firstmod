@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import technologicalmayhem.firstmod.ModBlocks;
 import technologicalmayhem.firstmod.block.*;
+import technologicalmayhem.firstmod.item.ItemTurretHead;
 import technologicalmayhem.firstmod.item.ItemWeirdShard;
 
 @Mod.EventBusSubscriber
@@ -27,6 +28,7 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new ItemWeirdShard());
+        event.getRegistry().register(new ItemTurretHead());
 
         event.getRegistry().register(new ItemBlock(ModBlocks.detonatingFurnace).setRegistryName(ModBlocks.detonatingFurnace.getRegistryName()));
         event.getRegistry().register(new ItemBlock(ModBlocks.potentiometer).setRegistryName(ModBlocks.potentiometer.getRegistryName()));

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "bwb",
+    "wrw",
+    "bwb"
+  ],
+  "key": {
+    "w": {
+      "item": "minecraft:cobblestone_wall",
+      "data": 0
+    },
+    "b": {
+      "item": "minecraft:blaze_powder"
+    },
+    "r": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "result": {
+    "item": "firstmod:turrethead"
+  }
+}

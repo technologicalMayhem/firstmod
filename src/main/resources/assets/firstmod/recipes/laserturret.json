@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " t ",
+    " w ",
+    " s "
+  ],
+  "key": {
+    "w": {
+      "item": "minecraft:cobblestone_wall",
+      "data": 0
+    },
+    "t": {
+      "item": "firstmod:turrethead"
+    },
+    "s": {
+      "item": "minecraft:stone",
+      "data": 0
+    }
+  },
+  "result": {
+    "item": "firstmod:laserbase"
+  }
+}
