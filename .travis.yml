@@ -4,3 +4,12 @@ before_install:
  - chmod u+x ./gradlew
 install: ./gradlew setupCiWorkspace
 script: ./gradlew build
+deploy:
+  provider: releases
+  api_key:
+    secure: cLHyNlWOCTRNu7hKqM01JCSBBISZ23uwQEMmX2a2Rc31wSSaH+9Yi9pG1cKfc734qUvwrNiT8TjbwErOBxh6B2OOecOWXTsWkqw9oQo4CXnOSYZF+8wcHmZJd4WJXXrvugytSg9XNbsZT3tPO8nHCTAa20z9dOz3ydr4vC7xhtBFWaAVISdtXtrJ1Izyb27fW7/jhBJFU9tjh/A+//HZIDgyJDpXveXbu+JB4IY7oxBMGmIvBV3+tg5WgQ2Dj1ldOsSpgGesawwxqPjpjvfI2YCRzw7MOAcGExr/Z7omGcwghxYf0ib5KS+Q438zS+WcCLu1Oq/Has/PQn1CclMSR3enfCZxGQ8uUthe2JjfG+EZ0xCXHfSd2AcHkS0H8pu6E0Jrqcgon8bK0D9byfIM8faQgQ52k6b8PmbsLCCikcAKD82F8oByBCdoAtE4plM+YLprEp5868mQZlBf9iQMUeWSmSI/FbSkwokhJdbhL/I5Z1y5ejDpKBjhuJaFZyEYIUGz0lQW1wAgCAsYwS7R6CFlY1mVx79n88nfOzLUBI+Sf/CAKwLWRzrxLdO6FiRja2PXO1PYkKntmfHI3za3X5TuLMjRfQpPlm0pzjiBz9rfkP1+pH22Kv2ELkkWz28LB6uNqPyA8dwSvhv/xAqa7Kzu6yUj5swywaft5TkXCQs=
+  skip_cleanup: true
+  file: build/libs/*
+  on:
+    repo: technologicalMayhem/firstmod
+    tags: true
