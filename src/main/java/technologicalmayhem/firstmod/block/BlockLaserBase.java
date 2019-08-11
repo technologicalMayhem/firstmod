@@ -41,6 +41,14 @@ public class BlockLaserBase extends Block {
     }
 
     @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        boolean b1 = worldIn.getBlockState(pos.up(1)).getBlock().isReplaceable(worldIn, pos.up(1));
+        boolean b2 = worldIn.getBlockState(pos.up(2)).getBlock().isReplaceable(worldIn, pos.up(2));
+
+        return b1 && b2;
+    }
+
+    @Override
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
         if (state.getValue(MIDDLE)) {
             if (worldIn.getBlockState(pos.down()).getBlock() instanceof BlockLaserBase)
