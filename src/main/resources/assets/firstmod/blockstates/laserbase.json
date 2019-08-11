@@ -8,7 +8,9 @@
       {}
     ],
     "inventory": [
-      {}
+      {
+        "model": "firstmod:item_turret"
+      }
     ],
     "middle": {
       "false": {
