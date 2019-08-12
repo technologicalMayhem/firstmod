@@ -64,9 +64,9 @@ public class BlockDetonatingFurnace extends Block {
                 ItemStack stack = playerIn.getHeldItemMainhand();
                 int size = stack.getCount();
                 if (facing == EnumFacing.UP) {
-                    stack = te.insertFuel(stack);
-                } else {
                     stack = te.insertSmeltableItem(stack);
+                } else {
+                    stack = te.insertFuel(stack);
                 }
                 if (size != stack.getCount()) {
                     playerIn.setHeldItem(EnumHand.MAIN_HAND, stack);
