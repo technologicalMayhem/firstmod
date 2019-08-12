@@ -65,10 +65,9 @@ public class TileLaserTurret extends TileEntity implements ITickable {
             int count = 0;
             int[][] offsets = new int[][]{{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
             for (int[] offset : offsets) {
-                if (world.getBlockState(pos.add(offset[0], -2, offset[1])).getBlock() instanceof BlockLaserEnergyCollector) {
-                    if (world.canBlockSeeSky(pos.add(offset[0], -2, offset[1]).up())) {
-                        count++;
-                    }
+                if (world.getBlockState(pos.add(offset[0], -2, offset[1])).getBlock() instanceof BlockLaserEnergyCollector
+                        && world.canBlockSeeSky(pos.add(offset[0], -2, offset[1]).up())) {
+                    count++;
                 }
             }
             checkInterval = 100;
