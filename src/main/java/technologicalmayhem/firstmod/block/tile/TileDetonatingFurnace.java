@@ -315,4 +315,15 @@ public class TileDetonatingFurnace extends TileEntity implements ITickable {
         result.setCount(stack.getCount());
         return result;
     }
+
+    public int getFillLevel() {
+        float totalItems = 0;
+        for (int i = 0; i < 8; i++) {
+            totalItems += items.getStackInSlot(i).getCount();
+        }
+        double powerOut = Math.round(totalItems / 512 * 15);
+        if (totalItems < 512 && powerOut == 15) powerOut--;
+        if (totalItems > 0 && powerOut == 0) powerOut++;
+        return (int) powerOut;
+    }
 }

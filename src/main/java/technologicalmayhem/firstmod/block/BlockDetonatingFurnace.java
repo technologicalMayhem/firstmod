@@ -109,6 +109,17 @@ public class BlockDetonatingFurnace extends Block {
     }
 
     @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos) {
+        TileDetonatingFurnace te = ((TileDetonatingFurnace) worldIn.getTileEntity(pos));
+        return te.getFillLevel();
+    }
+
+    @Override
     public int getMetaFromState(IBlockState state) {
         return state.getValue(BlockHorizontal.FACING).getHorizontalIndex();
     }
