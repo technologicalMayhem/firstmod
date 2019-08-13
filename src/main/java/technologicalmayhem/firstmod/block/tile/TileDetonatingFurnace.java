@@ -13,8 +13,8 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
-import technologicalmayhem.firstmod.util.EnumFurnaceIgnitionResult;
-import technologicalmayhem.firstmod.util.EnumFurnacePhase;
+import technologicalmayhem.firstmod.util.enums.EnumFurnaceIgnitionResult;
+import technologicalmayhem.firstmod.util.enums.EnumFurnacePhase;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

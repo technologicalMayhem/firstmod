@@ -27,8 +27,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import technologicalmayhem.firstmod.FirstMod;
 import technologicalmayhem.firstmod.block.tile.TileDetonatingFurnace;
-import technologicalmayhem.firstmod.util.EnumFurnaceIgnitionResult;
-import technologicalmayhem.firstmod.util.EnumFurnacePhase;
+import technologicalmayhem.firstmod.util.enums.EnumFurnaceIgnitionResult;
+import technologicalmayhem.firstmod.util.enums.EnumFurnacePhase;
 
 import javax.annotation.Nullable;
 
