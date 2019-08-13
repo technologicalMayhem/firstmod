@@ -15,7 +15,6 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
@@ -38,7 +37,7 @@ public class WorldUtil {
             IBlockState iblockstate = worldIn.getBlockState(pos);
             worldIn.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
             PlacementSettings placementsettings = (new PlacementSettings()).setMirror(mirrorIn)
-                    .setRotation(rotationIn).setIgnoreEntities(false).setChunk((ChunkPos) null)
+                    .setRotation(rotationIn).setIgnoreEntities(false).setChunk(null)
                     .setIgnoreStructureBlock(false);
 
             template.addBlocksToWorldChunk(worldIn, pos, placementsettings);
@@ -93,8 +92,8 @@ public class WorldUtil {
             x2 = pos1.getX();
         }
         if (pos1.getY() < pos2.getY()) {
-            y1 = pos1.getX();
-            y2 = pos2.getX();
+            y1 = pos1.getY();
+            y2 = pos2.getY();
         } else {
             y1 = pos2.getY();
             y2 = pos1.getY();
