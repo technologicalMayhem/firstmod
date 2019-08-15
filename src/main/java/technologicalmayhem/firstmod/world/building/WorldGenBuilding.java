@@ -6,16 +6,15 @@
  * firstmod is Open Source and distributed under the MIT License.
  */
 
-package technologicalmayhem.firstmod.world;
+package technologicalmayhem.firstmod.world.building;
 
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import technologicalmayhem.firstmod.util.WorldUtil;
-import technologicalmayhem.firstmod.world.building.EnumBuildingPiece;
 
-public class WorldGenTower {
+public class WorldGenBuilding {
 
     public static void generate(World worldIn, BlockPos position) {
         Rotation currentRotation = Rotation.NONE;
