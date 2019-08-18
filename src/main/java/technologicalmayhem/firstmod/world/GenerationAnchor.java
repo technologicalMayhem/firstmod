@@ -1,29 +1,30 @@
 package technologicalmayhem.firstmod.world;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GenerationAnchor {
 
     private BlockPos pos;
-    private EnumFacing facing;
+    private Rotation rotation;
     private int removedFromMaster;
     private boolean isMaster;
     private GenerationAnchor parent;
 
-    public GenerationAnchor(BlockPos pos, EnumFacing facing) {
-        this.setPos(pos);
-        this.setFacing(facing);
-        this.setRemovedFromMaster(0);
-        this.setMaster(true);
-        this.setParent(null);
+    public GenerationAnchor(BlockPos pos, Rotation rotation) {
+        this.pos = pos;
+        this.rotation = rotation;
+        this.removedFromMaster = 0;
+        this.isMaster = true;
+        this.parent = null;
     }
 
     private GenerationAnchor(BlockPos pos, EnumFacing facing, GenerationAnchor parent) {
-        this.setPos(pos);
-        this.setFacing(facing);
-        this.setParent(parent);
-        this.setMaster(false);
+        this.pos = pos;
+        this.rotation = getRotation();
+        this.isMaster = true;
+        this.parent = null;
 
         int removed = 0;
         GenerationAnchor instance = this;
@@ -33,7 +34,7 @@ public class GenerationAnchor {
             instance = instance.getParent();
         }
 
-        this.setRemovedFromMaster(removed);
+        this.removedFromMaster = removed;
     }
 
     public GenerationAnchor createChild(BlockPos pos, EnumFacing facing) {
@@ -44,39 +45,19 @@ public class GenerationAnchor {
         return pos;
     }
 
-    public void setPos(BlockPos pos) {
-        this.pos = pos;
-    }
-
-    public EnumFacing getFacing() {
-        return facing;
-    }
-
-    public void setFacing(EnumFacing facing) {
-        this.facing = facing;
+    public Rotation getRotation() {
+        return rotation;
     }
 
     public int getRemovedFromMaster() {
         return removedFromMaster;
     }
 
-    public void setRemovedFromMaster(int removedFromMaster) {
-        this.removedFromMaster = removedFromMaster;
-    }
-
     public boolean isMaster() {
         return isMaster;
     }
 
-    public void setMaster(boolean master) {
-        isMaster = master;
-    }
-
     public GenerationAnchor getParent() {
         return parent;
-    }
-
-    public void setParent(GenerationAnchor parent) {
-        this.parent = parent;
     }
 }
