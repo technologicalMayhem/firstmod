@@ -9,6 +9,7 @@
 package technologicalmayhem.firstmod.world.building;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class ExtensionPoint {
@@ -26,5 +27,21 @@ public class ExtensionPoint {
 
     public EnumFacing getFacing() {
         return facing;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ExtensionPoint) {
+            ExtensionPoint e = ((ExtensionPoint) o);
+            if (this.offset == e.getOffset() && this.facing == e.getFacing()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ExtensionPoint rotate(Rotation rotation) {
+        BlockPos rotatedPos = offset.rotate(rotation);
+        return new ExtensionPoint(rotatedPos.getX(), rotatedPos.getY(), rotatedPos.getZ(), rotation.rotate(facing));
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import technologicalmayhem.firstmod.util.Pair;
 import technologicalmayhem.firstmod.util.WorldUtil;
 import technologicalmayhem.firstmod.world.GenerationAnchor;
 
@@ -23,8 +24,9 @@ public class WorldGenBuilding {
 
     public static void generate(World worldIn, BlockPos position) {
         ArrayList<GenerationAnchor> anchors = new ArrayList<>();
-        anchors.add(new GenerationAnchor(position, Rotation.NONE));
+        anchors.add(new GenerationAnchor(position, EnumFacing.NORTH));
 
+        //For debugging purposes
         EnumBuildingPiece[] pieces = new EnumBuildingPiece[]{
                 EnumBuildingPiece.HALLWAY,
                 EnumBuildingPiece.HALLWAY,
@@ -33,24 +35,25 @@ public class WorldGenBuilding {
                 EnumBuildingPiece.HALLWAY,
         };
         ArrayList<EnumBuildingPiece> debugPieces = new ArrayList<>(Arrays.asList(pieces));
-
         int steps = 25;
 
         while (!debugPieces.isEmpty()) {
             GenerationAnchor anchor = anchors.remove(0);
             EnumBuildingPiece piece = debugPieces.remove(0); //getNextPiece();
-            ExtensionPoint point = piece.getExtensionPoints()[(int) Math.round(worldIn.rand.nextDouble() * piece.getExtensionPoints().length)];
+
+            ExtensionPoint point = piece.getExtensionPoints()[(int) Math.round(worldIn.rand.nextDouble() * (piece.getExtensionPoints().length - 1))];
             BlockPos curPos = anchor.getPos();
-            Rotation curRot = anchor.getRotation();
+            EnumFacing curFace = anchor.getFacing();
+            Rotation requiredRotation = facingToRotation(point.getFacing());
+            ArrayList<Pair<BlockPos, EnumFacing>> extensionPoints = new ArrayList<>();
 
-            WorldUtil.generateStructure(worldIn, curPos, piece.getTemplateName(), Mirror.NONE, curRot);
+            WorldUtil.generateStructure(worldIn, curPos.add(piece.getWallOffset(worldIn, point)), piece.getTemplateName(), Mirror.NONE, requiredRotation);
 
-            for (ExtensionPoint p : piece.getExtensionPoints()) {
-                if (!point.equals(p) && steps > 0) {
-                    anchors.add(anchor.createChild(curPos.add(p.getOffset().rotate(curRot)), curRot.add(facingToRotation(p.getFacing()))));
+            for (ExtensionPoint e : piece.getExtensionPoints(requiredRotation)) {
+                if (!point.equals(e)) {
+                    anchors.add(anchor.createChild(curPos.add(e.getOffset().rotate(requiredRotation)), requiredRotation.rotate(curFace)));
                 }
             }
-            if (steps > 0) steps--;
         }
     }
 

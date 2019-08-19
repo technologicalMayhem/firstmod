@@ -10,6 +10,11 @@ package technologicalmayhem.firstmod.world.building;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import technologicalmayhem.firstmod.util.WorldUtil;
+
+import java.util.ArrayList;
 
 public enum EnumBuildingPiece {
     HALLWAY("brick_hallway", new ExtensionPoint[]{
@@ -43,6 +48,31 @@ public enum EnumBuildingPiece {
 
     public ExtensionPoint[] getExtensionPoints() {
         return extensionPoints;
+    }
+
+    public ExtensionPoint[] getExtensionPoints(Rotation rotation) {
+        ArrayList<ExtensionPoint> rotatedPoints = new ArrayList<>();
+        for (ExtensionPoint p : extensionPoints) {
+            rotatedPoints.add(p.rotate(rotation));
+        }
+        return rotatedPoints.toArray(new ExtensionPoint[rotatedPoints.size() - 1]);
+    }
+
+    public BlockPos getWallOffset(World worldIn, ExtensionPoint extensionPoint) {
+        BlockPos size = WorldUtil.getStructureDimensions(worldIn, templateName);
+        BlockPos pos;
+        switch (extensionPoint.getFacing()) {
+            case SOUTH:
+                pos = new BlockPos(size.getX(), 0, size.getY());
+                break;
+            case WEST:
+                pos = new BlockPos(0, 0, size.getZ());
+            case EAST:
+                pos = new BlockPos(size.getX(), 0, 0);
+            default:
+                pos = new BlockPos(0, 0, 0);
+        }
+        return new BlockPos(extensionPoint.getOffset().add(WorldUtil.negateBlockPos(pos)));
     }
 
     public int getWeight() {

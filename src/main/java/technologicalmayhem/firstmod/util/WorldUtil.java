@@ -33,6 +33,7 @@ public class WorldUtil {
         ResourceLocation resourceLocation = new ResourceLocation(FirstMod.MODID, structureName);
         Template template = templateManager.get(minecraftServer, resourceLocation);
 
+
         if (template != null) {
             IBlockState iblockstate = worldIn.getBlockState(pos);
             worldIn.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
@@ -58,6 +59,21 @@ public class WorldUtil {
         return null;
     }
 
+    public static BlockPos rotateRoomPlacementPoint(World worldIn, BlockPos pos, String structureName, Rotation rotation) {
+        BlockPos roomOffset = getStructureDimensions(worldIn, structureName).add(-1, -1, -1);
+
+        switch (rotation) {
+            case CLOCKWISE_90:
+                return pos.add(roomOffset.getX(), 0, 0);
+            case CLOCKWISE_180:
+                return pos.add(roomOffset.getX(), 0, roomOffset.getZ());
+            case COUNTERCLOCKWISE_90:
+                return pos.add(0, 0, roomOffset.getZ());
+            default:
+                return pos;
+        }
+    }
+
     public static ArrayList<BlockPos> findAllBlocksInArea(World worldIn, Block blockIn, BlockPos pos1, BlockPos pos2) {
         ArrayList<BlockPos> positions = new ArrayList<>();
 
@@ -74,6 +90,10 @@ public class WorldUtil {
             }
         }
         return positions;
+    }
+
+    public static BlockPos negateBlockPos(BlockPos blockPos) {
+        return new BlockPos(-blockPos.getX(), -blockPos.getY(), -blockPos.getZ());
     }
 
     public static Pair<BlockPos, BlockPos> getEdges(BlockPos pos1, BlockPos pos2) {
