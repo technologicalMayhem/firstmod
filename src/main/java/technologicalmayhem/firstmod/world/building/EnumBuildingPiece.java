@@ -8,45 +8,44 @@
 
 package technologicalmayhem.firstmod.world.building;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 public enum EnumBuildingPiece {
-    HALLWAY("building_hallway", Rotation.NONE, new BlockPos[]{new BlockPos(0, 0, 5)}, 30, new BlockPos(0, 0, 0)),
-    CORNER("building_corner", Rotation.CLOCKWISE_90, new BlockPos[]{new BlockPos(-3, 0, 2)}, 5, new BlockPos(-2, 0, 0)),
-    CORNER_MIRRORED("building_corner", Rotation.CLOCKWISE_90, new BlockPos[]{new BlockPos(-3, 0, 2)}, 5, new BlockPos(-2, 0, 0));
+    HALLWAY("brick_hallway", new ExtensionPoint[]{
+            new ExtensionPoint(0, 0, 5, EnumFacing.NORTH),
+            new ExtensionPoint(0, 0, 5, EnumFacing.SOUTH)
+    }, 20),
+    CORNER("brick_corner", new ExtensionPoint[]{
+            new ExtensionPoint(5, 0, 0, EnumFacing.NORTH),
+            new ExtensionPoint(5, 0, 4, EnumFacing.EAST)
+    }, 10),
+    ROOM_3WAY("brick_3_way", new ExtensionPoint[]{
+            new ExtensionPoint(5, 0, -1, EnumFacing.NORTH),
+            new ExtensionPoint(13, 0, 8, EnumFacing.EAST),
+            new ExtensionPoint(7, 0, 14, EnumFacing.SOUTH)
+    }, 5);
 
     private String templateName;
-    private BlockPos offset;
-    private Rotation rotation;
-    private BlockPos[] extensionPoints;
+    private ExtensionPoint[] extensionPoints;
     private int weight;
 
-    EnumBuildingPiece(String templateName, Rotation rotation, BlockPos[] extensionPoints, int weight, BlockPos offset) {
+    EnumBuildingPiece(String templateName, ExtensionPoint[] extensionPoints, int weight) {
         this.templateName = templateName;
-        this.offset = offset;
-        this.rotation = rotation;
         this.extensionPoints = extensionPoints;
         this.weight = weight;
+        Rotation.NONE.rotate(EnumFacing.NORTH);
     }
 
     public String getTemplateName() {
         return templateName;
     }
 
-    public Rotation getRotation() {
-        return rotation;
-    }
-
-    public BlockPos[] getExtensionPoints() {
+    public ExtensionPoint[] getExtensionPoints() {
         return extensionPoints;
     }
 
     public int getWeight() {
         return weight;
-    }
-
-    public BlockPos getOffset() {
-        return offset;
     }
 }

@@ -8,25 +8,64 @@
 
 package technologicalmayhem.firstmod.world.building;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import technologicalmayhem.firstmod.util.WorldUtil;
+import technologicalmayhem.firstmod.world.GenerationAnchor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class WorldGenBuilding {
 
     public static void generate(World worldIn, BlockPos position) {
-        Rotation currentRotation = Rotation.NONE;
-        BlockPos currentPosition = position;
+        ArrayList<GenerationAnchor> anchors = new ArrayList<>();
+        anchors.add(new GenerationAnchor(position, Rotation.NONE));
 
+        EnumBuildingPiece[] pieces = new EnumBuildingPiece[]{
+                EnumBuildingPiece.HALLWAY,
+                EnumBuildingPiece.HALLWAY,
+                EnumBuildingPiece.HALLWAY,
+                EnumBuildingPiece.CORNER,
+                EnumBuildingPiece.HALLWAY,
+        };
+        ArrayList<EnumBuildingPiece> debugPieces = new ArrayList<>(Arrays.asList(pieces));
 
-        for (int i = 0; i < 10; i++) {
-            EnumBuildingPiece piece = getNextPiece();
-            WorldUtil.generateStructure(worldIn, currentPosition.add(piece.getOffset().rotate(currentRotation)), piece.getTemplateName(), Mirror.NONE, currentRotation);
+        int steps = 25;
 
-            currentPosition = currentPosition.add(piece.getExtensionPoints()[0].rotate(currentRotation));
-            currentRotation = currentRotation.add(piece.getRotation());
+        while (!debugPieces.isEmpty()) {
+            GenerationAnchor anchor = anchors.remove(0);
+            EnumBuildingPiece piece = debugPieces.remove(0); //getNextPiece();
+            ExtensionPoint point = piece.getExtensionPoints()[(int) Math.round(worldIn.rand.nextDouble() * piece.getExtensionPoints().length)];
+            BlockPos curPos = anchor.getPos();
+            Rotation curRot = anchor.getRotation();
+
+            WorldUtil.generateStructure(worldIn, curPos, piece.getTemplateName(), Mirror.NONE, curRot);
+
+            for (ExtensionPoint p : piece.getExtensionPoints()) {
+                if (!point.equals(p) && steps > 0) {
+                    anchors.add(anchor.createChild(curPos.add(p.getOffset().rotate(curRot)), curRot.add(facingToRotation(p.getFacing()))));
+                }
+            }
+            if (steps > 0) steps--;
+        }
+    }
+
+    static Rotation facingToRotation(EnumFacing facing) {
+        switch (facing) {
+            case SOUTH:
+                return Rotation.NONE;
+            case WEST:
+                return Rotation.CLOCKWISE_90;
+            case NORTH:
+                return Rotation.CLOCKWISE_180;
+            case EAST:
+                return Rotation.COUNTERCLOCKWISE_90;
+            default:
+                throw new IllegalArgumentException("We shouldn't get this far");
         }
     }
 
