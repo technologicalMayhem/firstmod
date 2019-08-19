@@ -17,29 +17,30 @@ import technologicalmayhem.firstmod.util.WorldUtil;
 import java.util.ArrayList;
 
 public enum EnumBuildingPiece {
-    HALLWAY("brick_hallway", new ExtensionPoint[]{
-            new ExtensionPoint(0, 0, 5, EnumFacing.NORTH),
-            new ExtensionPoint(0, 0, 5, EnumFacing.SOUTH)
+    HALLWAY("brick_hallway", new int[]{0, 0}, new ExtensionPoint[]{
+            new ExtensionPoint(4, 0, -1, EnumFacing.NORTH),
+            new ExtensionPoint(4, 0, 5, EnumFacing.SOUTH)
     }, 20),
-    CORNER("brick_corner", new ExtensionPoint[]{
-            new ExtensionPoint(5, 0, 0, EnumFacing.NORTH),
+    CORNER("brick_corner", new int[]{0, 0}, new ExtensionPoint[]{
+            new ExtensionPoint(4, 0, -1, EnumFacing.NORTH),
             new ExtensionPoint(5, 0, 4, EnumFacing.EAST)
     }, 10),
-    ROOM_3WAY("brick_3_way", new ExtensionPoint[]{
-            new ExtensionPoint(5, 0, -1, EnumFacing.NORTH),
-            new ExtensionPoint(13, 0, 8, EnumFacing.EAST),
-            new ExtensionPoint(7, 0, 14, EnumFacing.SOUTH)
+    ROOM_3WAY("brick_room_3way", new int[]{3, 6, 3}, new ExtensionPoint[]{
+            new ExtensionPoint(7, 0, -1, EnumFacing.NORTH),
+            new ExtensionPoint(15, 0, 9, EnumFacing.EAST),
+            new ExtensionPoint(8, 0, 15, EnumFacing.SOUTH)
     }, 5);
 
     private String templateName;
+    private int[] offsets;
     private ExtensionPoint[] extensionPoints;
     private int weight;
 
-    EnumBuildingPiece(String templateName, ExtensionPoint[] extensionPoints, int weight) {
+    EnumBuildingPiece(String templateName, int[] offsets, ExtensionPoint[] extensionPoints, int weight) {
         this.templateName = templateName;
+        this.offsets = offsets;
         this.extensionPoints = extensionPoints;
         this.weight = weight;
-        Rotation.NONE.rotate(EnumFacing.NORTH);
     }
 
     public String getTemplateName() {
