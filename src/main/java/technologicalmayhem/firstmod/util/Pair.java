@@ -13,7 +13,7 @@ public class Pair<T, U> {
     private T A;
     private U B;
 
-    Pair(T A, U B) {
+    public Pair(T A, U B) {
         this.A = A;
         this.B = B;
     }
