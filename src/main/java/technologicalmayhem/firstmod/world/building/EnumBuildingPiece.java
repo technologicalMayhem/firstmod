@@ -19,14 +19,14 @@ import java.util.ArrayList;
 public enum EnumBuildingPiece {
     HALLWAY("brick_hallway", new int[]{0, 0}, new ExtensionPoint[]{
             new ExtensionPoint(4, 0, -1, EnumFacing.NORTH),
-            new ExtensionPoint(4, 0, 5, EnumFacing.SOUTH)
+            new ExtensionPoint(0, 0, 5, EnumFacing.SOUTH)
     }, 20),
     CORNER("brick_corner", new int[]{0, 0}, new ExtensionPoint[]{
             new ExtensionPoint(4, 0, -1, EnumFacing.NORTH),
             new ExtensionPoint(5, 0, 4, EnumFacing.EAST)
     }, 10),
-    ROOM_3WAY("brick_room_3way", new int[]{3, 6, 3}, new ExtensionPoint[]{
-            new ExtensionPoint(7, 0, -1, EnumFacing.NORTH),
+    ROOM_3WAY("brick_room_3way", new int[]{2, 5, 2}, new ExtensionPoint[]{
+            new ExtensionPoint(6, 0, -1, EnumFacing.NORTH),
             new ExtensionPoint(15, 0, 9, EnumFacing.EAST),
             new ExtensionPoint(8, 0, 15, EnumFacing.SOUTH)
     }, 5);
@@ -59,6 +59,11 @@ public enum EnumBuildingPiece {
         return rotatedPoints.toArray(new ExtensionPoint[rotatedPoints.size() - 1]);
     }
 
+    public BlockPos getCenter(World worldIn) {
+        BlockPos size = WorldUtil.getStructureDimensions(worldIn, templateName).add(-1, -1, -1);
+        return new BlockPos(size.getX() / 2, size.getY() / 2, size.getZ() / 2);
+    }
+
     public BlockPos getWallOffset(World worldIn, ExtensionPoint extensionPoint) {
         BlockPos size = WorldUtil.getStructureDimensions(worldIn, templateName);
         BlockPos pos;
@@ -78,5 +83,9 @@ public enum EnumBuildingPiece {
 
     public int getWeight() {
         return weight;
+    }
+
+    public int[] getOffsets() {
+        return offsets;
     }
 }

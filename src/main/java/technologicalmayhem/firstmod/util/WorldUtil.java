@@ -32,16 +32,29 @@ public class WorldUtil {
         TemplateManager templateManager = ((WorldServer) worldIn).getStructureTemplateManager();
         ResourceLocation resourceLocation = new ResourceLocation(FirstMod.MODID, structureName);
         Template template = templateManager.get(minecraftServer, resourceLocation);
+        BlockPos dimensions = getStructureDimensions(worldIn, structureName).add(-1, -1, -1);
+        BlockPos offset = new BlockPos(0, 0, 0);
 
+        switch (rotationIn) {
+            case CLOCKWISE_90:
+                offset = new BlockPos(dimensions.getX(), 0, 0);
+                break;
+            case CLOCKWISE_180:
+                offset = new BlockPos(dimensions.getX(), 0, dimensions.getZ());
+                break;
+            case COUNTERCLOCKWISE_90:
+                offset = new BlockPos(0, 0, dimensions.getZ());
+                break;
+        }
 
         if (template != null) {
-            IBlockState iblockstate = worldIn.getBlockState(pos);
-            worldIn.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
             PlacementSettings placementsettings = (new PlacementSettings()).setMirror(mirrorIn)
                     .setRotation(rotationIn).setIgnoreEntities(false).setChunk(null)
                     .setIgnoreStructureBlock(false);
+            template.addBlocksToWorldChunk(worldIn, pos.add(offset), placementsettings);
 
-            template.addBlocksToWorldChunk(worldIn, pos, placementsettings);
+            IBlockState iblockstate = worldIn.getBlockState(pos.add(offset));
+            worldIn.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
         }
     }
 
@@ -90,6 +103,29 @@ public class WorldUtil {
             }
         }
         return positions;
+    }
+
+    public static BlockPos rotateAroundCenter(BlockPos point, BlockPos center, Rotation rotation) {
+        int rotationDeg = 0;
+        switch (rotation) {
+            case CLOCKWISE_90:
+                rotationDeg = 90;
+                break;
+            case CLOCKWISE_180:
+                rotationDeg = 180;
+                break;
+            case COUNTERCLOCKWISE_90:
+                rotationDeg = 270;
+                break;
+            default:
+                return point;
+        }
+        double angle = rotationDeg * (Math.PI / 180);
+
+        int rotatedX = (int) Math.round(Math.cos(angle) * (point.getX() - center.getX()) - Math.sin(angle) * (point.getZ() - center.getZ()) + center.getZ());
+        int rotatedZ = (int) Math.round(Math.sin(angle) * (point.getX() - center.getX()) + Math.cos(angle) * (point.getZ() - center.getZ()) + center.getZ());
+
+        return new BlockPos(rotatedX, 0, rotatedZ);
     }
 
     public static BlockPos negateBlockPos(BlockPos blockPos) {

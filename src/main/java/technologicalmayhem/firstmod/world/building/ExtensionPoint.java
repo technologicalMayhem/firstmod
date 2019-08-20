@@ -40,6 +40,21 @@ public class ExtensionPoint {
         return false;
     }
 
+    public Rotation getRotation() {
+        switch (facing) {
+            case SOUTH:
+                return Rotation.NONE;
+            case WEST:
+                return Rotation.CLOCKWISE_90;
+            case NORTH:
+                return Rotation.CLOCKWISE_180;
+            case EAST:
+                return Rotation.COUNTERCLOCKWISE_90;
+            default:
+                throw new IllegalArgumentException("We shouldn't get this far");
+        }
+    }
+
     public ExtensionPoint rotate(Rotation rotation) {
         BlockPos rotatedPos = offset.rotate(rotation);
         return new ExtensionPoint(rotatedPos.getX(), rotatedPos.getY(), rotatedPos.getZ(), rotation.rotate(facing));

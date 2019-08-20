@@ -1,6 +1,7 @@
 package technologicalmayhem.firstmod.world;
 
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GenerationAnchor {
@@ -38,6 +39,21 @@ public class GenerationAnchor {
 
     public GenerationAnchor createChild(BlockPos pos, EnumFacing facing) {
         return new GenerationAnchor(pos, facing, this);
+    }
+
+    public Rotation getRotation() {
+        switch (facing) {
+            case SOUTH:
+                return Rotation.NONE;
+            case WEST:
+                return Rotation.CLOCKWISE_90;
+            case NORTH:
+                return Rotation.CLOCKWISE_180;
+            case EAST:
+                return Rotation.COUNTERCLOCKWISE_90;
+            default:
+                throw new IllegalArgumentException("We shouldn't get this far");
+        }
     }
 
     public BlockPos getPos() {

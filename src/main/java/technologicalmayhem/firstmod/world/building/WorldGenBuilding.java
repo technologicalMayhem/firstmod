@@ -13,7 +13,6 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import technologicalmayhem.firstmod.util.Pair;
 import technologicalmayhem.firstmod.util.WorldUtil;
 import technologicalmayhem.firstmod.world.GenerationAnchor;
 
@@ -24,14 +23,15 @@ public class WorldGenBuilding {
 
     public static void generate(World worldIn, BlockPos position) {
         ArrayList<GenerationAnchor> anchors = new ArrayList<>();
-        anchors.add(new GenerationAnchor(position, EnumFacing.NORTH));
+        anchors.add(new GenerationAnchor(position, EnumFacing.SOUTH));
 
         //For debugging purposes
         EnumBuildingPiece[] pieces = new EnumBuildingPiece[]{
                 EnumBuildingPiece.HALLWAY,
                 EnumBuildingPiece.HALLWAY,
                 EnumBuildingPiece.HALLWAY,
-                EnumBuildingPiece.CORNER,
+                EnumBuildingPiece.HALLWAY,
+                EnumBuildingPiece.ROOM_3WAY,
                 EnumBuildingPiece.HALLWAY,
         };
         ArrayList<EnumBuildingPiece> debugPieces = new ArrayList<>(Arrays.asList(pieces));
@@ -40,35 +40,24 @@ public class WorldGenBuilding {
         while (!debugPieces.isEmpty()) {
             GenerationAnchor anchor = anchors.remove(0);
             EnumBuildingPiece piece = debugPieces.remove(0); //getNextPiece();
-
-            ExtensionPoint point = piece.getExtensionPoints()[(int) Math.round(worldIn.rand.nextDouble() * (piece.getExtensionPoints().length - 1))];
+//            int random = 1;
+            int random = (int) Math.round(worldIn.rand.nextDouble() * (piece.getExtensionPoints().length - 1));
+            ExtensionPoint point = piece.getExtensionPoints()[random];
+            BlockPos offset = new BlockPos(-piece.getOffsets()[random], 0, 0);
             BlockPos curPos = anchor.getPos();
-            EnumFacing curFace = anchor.getFacing();
-            Rotation requiredRotation = facingToRotation(point.getFacing());
-            ArrayList<Pair<BlockPos, EnumFacing>> extensionPoints = new ArrayList<>();
+            BlockPos size = WorldUtil.getStructureDimensions(worldIn, piece.getTemplateName()).add(-1, -1, -1);
+            BlockPos center = new BlockPos(size.getX() / 2, size.getY() / 2, size.getZ() / 2);
 
-            WorldUtil.generateStructure(worldIn, curPos.add(piece.getWallOffset(worldIn, point)), piece.getTemplateName(), Mirror.NONE, requiredRotation);
+            WorldUtil.generateStructure(worldIn, curPos.add(offset), piece.getTemplateName(), Mirror.NONE, point.getRotation());
 
-            for (ExtensionPoint e : piece.getExtensionPoints(requiredRotation)) {
+            for (ExtensionPoint e : piece.getExtensionPoints()) {
                 if (!point.equals(e)) {
-                    anchors.add(anchor.createChild(curPos.add(e.getOffset().rotate(requiredRotation)), requiredRotation.rotate(curFace)));
+                    BlockPos offsetRot = WorldUtil.rotateAroundCenter(e.getOffset(), center, point.getRotation().add(Rotation.CLOCKWISE_180));
+                    BlockPos pos = curPos.add(offsetRot).add(offset);
+//                    worldIn.setBlockState(pos, Blocks.WOOL.getDefaultState(), 2);
+                    anchors.add(anchor.createChild(pos, anchor.getFacing()));
                 }
             }
-        }
-    }
-
-    static Rotation facingToRotation(EnumFacing facing) {
-        switch (facing) {
-            case SOUTH:
-                return Rotation.NONE;
-            case WEST:
-                return Rotation.CLOCKWISE_90;
-            case NORTH:
-                return Rotation.CLOCKWISE_180;
-            case EAST:
-                return Rotation.COUNTERCLOCKWISE_90;
-            default:
-                throw new IllegalArgumentException("We shouldn't get this far");
         }
     }
 
