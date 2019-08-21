@@ -6,7 +6,15 @@
  * firstmod is Open Source and distributed under the MIT License.
  */
 
-package technologicalmayhem.firstmod.world.building;
+/*
+ * This class was created by technologicalMayhem and is distributed as part of firstmod.
+ * Get the full source code here:
+ * http://github.com/technologicalMayhem/firstmod/
+ *
+ * firstmod is Open Source and distributed under the MIT License.
+ */
+
+package technologicalmayhem.firstmod.world;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Rotation;
@@ -42,8 +50,6 @@ public class ExtensionPoint {
 
     public Rotation getRotation() {
         switch (facing) {
-            case SOUTH:
-                return Rotation.NONE;
             case WEST:
                 return Rotation.CLOCKWISE_90;
             case NORTH:
@@ -51,7 +57,7 @@ public class ExtensionPoint {
             case EAST:
                 return Rotation.COUNTERCLOCKWISE_90;
             default:
-                throw new IllegalArgumentException("We shouldn't get this far");
+                return Rotation.NONE;
         }
     }
 

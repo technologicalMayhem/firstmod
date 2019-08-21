@@ -23,6 +23,7 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import technologicalmayhem.firstmod.FirstMod;
 
 import javax.annotation.Nullable;
+import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 
 public class WorldUtil {
@@ -105,7 +106,7 @@ public class WorldUtil {
         return positions;
     }
 
-    public static BlockPos rotateAroundCenter(BlockPos point, BlockPos center, Rotation rotation) {
+    public static BlockPos rotateAroundCenter(BlockPos point, Vector3d center, Rotation rotation) {
         int rotationDeg = 0;
         switch (rotation) {
             case CLOCKWISE_90:
