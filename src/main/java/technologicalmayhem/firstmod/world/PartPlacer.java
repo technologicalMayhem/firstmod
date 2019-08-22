@@ -8,6 +8,7 @@
 
 package technologicalmayhem.firstmod.world;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -19,6 +20,7 @@ import technologicalmayhem.firstmod.world.building.EnumBuildingPart;
 import javax.vecmath.Vector3d;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -53,18 +55,26 @@ public class PartPlacer {
         if (!canGenerate() || !canGenerate.test(world)) return null;
         selectedPoint = extensionPoints.remove(new Random().nextInt(extensionPoints.size()));
         generationPos = anchor.getPos();
-        extensionPos = generationPos.add(WorldUtil.rotateAroundCenter(selectedPoint.getOffset(), new Vector3d(sizeX / 2, sizeY / 2, sizeZ / 2), selectedPoint.getRotation()));
         generationRot = anchor.getRotation();
+        extensionPos = generationPos.add(WorldUtil.rotateAroundCenter(selectedPoint.getOffset(), getCenter(), selectedPoint.getRotation().add(generationRot)));
         //connect extensions points
         move(anchor.getPos().subtract(extensionPos));
-        WorldUtil.generateStructure(world, generationPos, structureName, Mirror.NONE, selectedPoint.getRotation());
+        move(anchor.getFacing());
+        WorldUtil.generateStructure(world, generationPos, structureName, Mirror.NONE, selectedPoint.getRotation().add(generationRot));
 
-        ArrayList<GenerationAnchor> anchors = new ArrayList<>();
+        world.setBlockState(generationPos, Blocks.WOOL.getStateFromMeta(2));
+        world.setBlockState(extensionPos, Blocks.WOOL.getStateFromMeta(3));
+
+        List<GenerationAnchor> anchorList = new ArrayList<>();
         for (ExtensionPoint e : extensionPoints) {
-            anchors.add(anchor.createChild(generationPos.add(e.getOffset()), e.getRotation().rotate(anchor.getFacing())));
+            anchorList.add(anchor.createChild(generationPos.add(WorldUtil.rotateAroundCenter(e.getOffset(), getCenter(), selectedPoint.getRotation())), generationRot.add(e.getRotation())));
         }
 
-        return (GenerationAnchor[]) anchors.toArray();
+        return anchorList.toArray(new GenerationAnchor[0]);
+    }
+
+    private Vector3d getCenter() {
+        return new Vector3d(sizeX / 2, sizeY / 2, sizeZ / 2);
     }
 
 

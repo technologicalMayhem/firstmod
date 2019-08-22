@@ -8,7 +8,7 @@
 
 package technologicalmayhem.firstmod.world.building;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Rotation;
 import net.minecraft.world.World;
 import technologicalmayhem.firstmod.util.RandomUtil;
 import technologicalmayhem.firstmod.util.enums.IWeightable;
@@ -19,17 +19,17 @@ import java.util.function.Predicate;
 
 public enum EnumBuildingPart implements IGenerationInfo, IWeightable {
     HALLWAY(5, 5, 5, "brick_hallway", new ExtensionPoint[]{
-            new ExtensionPoint(2, 0, -1, EnumFacing.NORTH),
-            new ExtensionPoint(2, 0, 5, EnumFacing.SOUTH)
+            new ExtensionPoint(2, 0, -1, Rotation.NONE),
+            new ExtensionPoint(2, 0, 5, Rotation.CLOCKWISE_180)
     }, 20),
     CORNER(5, 5, 5, "brick_corner", new ExtensionPoint[]{
-            new ExtensionPoint(2, 0, -1, EnumFacing.NORTH),
-            new ExtensionPoint(2, 0, 4, EnumFacing.EAST)
+            new ExtensionPoint(2, 0, -1, Rotation.NONE),
+            new ExtensionPoint(2, 0, 4, Rotation.COUNTERCLOCKWISE_90)
     }, 10),
     ROOM_3WAY(15, 5, 15, "brick_room_3way", new ExtensionPoint[]{
-            new ExtensionPoint(4, 0, -1, EnumFacing.NORTH),
-            new ExtensionPoint(15, 0, 7, EnumFacing.EAST),
-            new ExtensionPoint(10, 0, 15, EnumFacing.SOUTH)
+            new ExtensionPoint(4, 0, -1, Rotation.NONE),
+            new ExtensionPoint(15, 0, 7, Rotation.COUNTERCLOCKWISE_90),
+            new ExtensionPoint(10, 0, 15, Rotation.CLOCKWISE_180)
     }, 5);
 
     public int sizeX;

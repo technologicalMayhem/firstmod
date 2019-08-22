@@ -54,8 +54,10 @@ public class WorldUtil {
                     .setIgnoreStructureBlock(false);
             template.addBlocksToWorldChunk(worldIn, pos.add(offset), placementsettings);
 
-            IBlockState iblockstate = worldIn.getBlockState(pos.add(offset));
-            worldIn.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
+            for (BlockPos b : BlockPos.getAllInBox(pos.add(offset), pos.add(offset).add(getStructureDimensions(worldIn, structureName)))) {
+                IBlockState iblockstate = worldIn.getBlockState(b);
+                worldIn.notifyBlockUpdate(pos, iblockstate, iblockstate, 3);
+            }
         }
     }
 

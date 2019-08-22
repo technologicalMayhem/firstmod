@@ -37,8 +37,8 @@ public class GenerationAnchor {
         this.removedFromMaster = removed;
     }
 
-    public GenerationAnchor createChild(BlockPos pos, EnumFacing facing) {
-        return new GenerationAnchor(pos, facing, this);
+    public GenerationAnchor createChild(BlockPos pos, Rotation rotation) {
+        return new GenerationAnchor(pos, rotation.rotate(facing), this);
     }
 
     public Rotation getRotation() {

@@ -27,9 +27,7 @@ public class WorldGenBuilding {
         EnumBuildingPart[] parts = new EnumBuildingPart[]{
                 EnumBuildingPart.HALLWAY,
                 EnumBuildingPart.HALLWAY,
-                EnumBuildingPart.HALLWAY,
-                EnumBuildingPart.HALLWAY,
-                EnumBuildingPart.ROOM_3WAY,
+                EnumBuildingPart.CORNER,
                 EnumBuildingPart.HALLWAY,
         };
         ArrayList<EnumBuildingPart> debugParts = new ArrayList<>(Arrays.asList(parts));
