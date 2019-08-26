@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.Logger;
 import technologicalmayhem.firstmod.block.tile.TileDetonatingFurnace;
 import technologicalmayhem.firstmod.block.tile.TileLaserTurret;
+import technologicalmayhem.firstmod.world.GenBrokenTower;
 
 @Mod(modid = FirstMod.MODID, name = FirstMod.NAME, version = FirstMod.VERSION)
 public class FirstMod {
@@ -22,5 +23,7 @@ public class FirstMod {
         logger = event.getModLog();
         GameRegistry.registerTileEntity(TileDetonatingFurnace.class, new ResourceLocation(MODID, "tileDetonatingFurnace"));
         GameRegistry.registerTileEntity(TileLaserTurret.class, new ResourceLocation(MODID, "tileLaserTurret"));
+
+        GameRegistry.registerWorldGenerator(new GenBrokenTower(), 20);
     }
 }
