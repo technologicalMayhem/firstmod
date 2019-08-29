@@ -18,19 +18,11 @@ package technologicalmayhem.firstmod.util;
 
 public class Pair<T, U> {
 
-    private T A;
-    private U B;
+    public T A;
+    public U B;
 
     public Pair(T A, U B) {
         this.A = A;
         this.B = B;
-    }
-
-    public U getB() {
-        return B;
-    }
-
-    public T getA() {
-        return A;
     }
 }

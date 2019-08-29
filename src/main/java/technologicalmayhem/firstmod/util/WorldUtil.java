@@ -103,9 +103,9 @@ public class WorldUtil {
     public static void forEachBlockInArea(BlockPos pos1, BlockPos pos2, Consumer<BlockPos> consumer) {
         final Pair<BlockPos, BlockPos> edges = getEdges(pos1, pos2);
 
-        for (int x = edges.getA().getX(); x < edges.getB().getX(); x++) {
-            for (int y = edges.getA().getY(); y < edges.getB().getY(); y++) {
-                for (int z = edges.getA().getZ(); z < edges.getB().getZ(); z++) {
+        for (int x = edges.A.getX(); x < edges.B.getX(); x++) {
+            for (int y = edges.A.getY(); y < edges.B.getY(); y++) {
+                for (int z = edges.A.getZ(); z < edges.B.getZ(); z++) {
                     consumer.accept(new BlockPos(x, y, z));
                 }
             }
