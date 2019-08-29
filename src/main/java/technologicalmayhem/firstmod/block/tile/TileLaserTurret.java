@@ -12,35 +12,45 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import technologicalmayhem.firstmod.block.BlockLaserEnergyCollector;
+import technologicalmayhem.firstmod.util.EntityDistanceComparator;
+import technologicalmayhem.firstmod.util.Pair;
 
 import javax.annotation.Nullable;
 import javax.vecmath.Vector3d;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 public class TileLaserTurret extends TileEntity implements ITickable {
 
-    private static final int range = 10;
+    //Base Values
+    private final int baseTargets = 1;
+    private final float damage = 3.0F;
+    private final int attackSpeed = 20;
+    private final int range = 10;
     private int charges = 0;
-    private int cooldown = 20;
     private int collectedEnergy = 0;
     private int connectedSensors = 0;
     private int checkInterval = 0;
-    private Entity target = null;
+    private List<Pair<Entity, Integer>> targets = new ArrayList<>();
+    //Modifiers
+    private int additionalTargets = 0;
+    private float damageMod = 1.0F;
+    private float speedMod = 1.0F;
+    private float rangeMod = 1.0F;
 
     @Override
     public void update() {
         if (!world.isRemote) {
             charge();
             if (charges > 0) {
-                if (hasValidTarget()) {
-                    attackTarget();
-                } else {
-                    searchForNewTarget();
-                }
+                validateTargets();
+                attackTarget();
             }
         } else {
-            if (charges > 0 && hasValidTarget()) {
+            if (charges > 0) {
+                validateTargets();
                 doParticles();
             }
         }
@@ -50,7 +60,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         if (world.isDaytime()) {
             checkSensors();
             collectedEnergy += connectedSensors;
-            if (collectedEnergy >= 1200) {
+            if (collectedEnergy >= 1) {
                 collectedEnergy = 0;
                 if (charges < 100) {
                     charges++;
@@ -77,70 +87,93 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         }
     }
 
-    private boolean hasValidTarget() {
+    private void validateTargets() {
+        boolean areAllValid = true;
+
+        Iterator<Pair<Entity, Integer>> iterator = targets.iterator();
+
+        while (iterator.hasNext()) {
+            Pair<Entity, Integer> target = iterator.next();
+            if (!isTargetValid(target.A)) {
+                areAllValid = false;
+                iterator.remove();
+                if (!world.isRemote) markDirty();
+            }
+        }
+        for (Pair<Entity, Integer> target : targets) {
+
+        }
+        if (!world.isRemote && (targets.size() < getBaseTargets() || !areAllValid)) {
+            searchForNewTargets();
+        }
+    }
+
+    private boolean isTargetValid(Entity target) {
         if (target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && target.isEntityAlive()) {
             return true;
         }
-        target = null;
-        if (!world.isRemote) markDirty();
         return false;
     }
 
     private void doParticles() {
-        //Get the difference between block and target
-        Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-        Vector3d diff = new Vector3d(target.posX - blockPos.x, target.posY - blockPos.y + target.height / 2, target.posZ - blockPos.z);
-        //Find the greatest difference
-        double greatest = 0;
-        for (Double n : new Double[]{diff.x, diff.y, diff.z}) {
-            if (Math.abs(n) > greatest) greatest = Math.abs(n);
-        }
-        //Find out how many we need to take and how much we need to move each step along the way
-        double posSteps = greatest / 0.1;
-        Vector3d step = new Vector3d(diff.x / posSteps, diff.y / posSteps, diff.z / posSteps);
+        for (Pair<Entity, Integer> target : targets) {
+            //Get the difference between block and target
+            Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+            Vector3d diff = new Vector3d(target.A.posX - blockPos.x, target.A.posY - blockPos.y + target.A.height / 2, target.A.posZ - blockPos.z);
+            //Find the greatest difference
+            double greatest = 0;
+            for (Double n : new Double[]{diff.x, diff.y, diff.z}) {
+                if (Math.abs(n) > greatest) greatest = Math.abs(n);
+            }
+            //Find out how many we need to take and how much we need to move each step along the way
+            double posSteps = greatest / 0.1;
+            Vector3d step = new Vector3d(diff.x / posSteps, diff.y / posSteps, diff.z / posSteps);
 
-        Vector3d curDiff = new Vector3d();
-        for (int i = 0; i < Math.floor(posSteps); i++) {
-            world.spawnParticle(EnumParticleTypes.REDSTONE,
-                    blockPos.x + curDiff.x, blockPos.y + curDiff.y, blockPos.z + curDiff.z,
-                    0, 0, 0);
-            curDiff.add(step);
+            Vector3d curDiff = new Vector3d();
+            for (int i = 0; i < Math.floor(posSteps); i++) {
+                world.spawnParticle(EnumParticleTypes.REDSTONE,
+                        blockPos.x + curDiff.x, blockPos.y + curDiff.y, blockPos.z + curDiff.z,
+                        0, 0, 0);
+                curDiff.add(step);
+            }
         }
     }
 
-    private void searchForNewTarget() {
+    private void searchForNewTargets() {
         List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, 3, range), pos.add(-range, -3, -range)));
+        entities.removeIf(entity -> !(entity instanceof IMob));
+        for (Pair<Entity, Integer> target : targets) {
+            entities.remove(target.A);
+        }
+
         if (!entities.isEmpty()) {
-            Entity newMob = null;
-            double distance = Double.MAX_VALUE;
-            for (Entity mob : entities) {
-                if (mob.getDistance(pos.getX(), pos.getY(), pos.getZ()) < distance && mob instanceof IMob) {
-                    newMob = mob;
-                    distance = Math.sqrt(mob.getDistanceSq(pos));
-                }
+            entities.sort(new EntityDistanceComparator(pos));
+            int missingTargets = Math.abs(getBaseTargets() - targets.size());
+            List<Entity> available = entities.subList(0, Math.min(missingTargets, entities.size()));
+            for (Entity entity : available) {
+                targets.add(new Pair<>(entity, attackSpeed));
             }
-            if (target != newMob) {
-                target = newMob;
-                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
-                markDirty();
-            }
+            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+            markDirty();
         }
     }
 
     private void attackTarget() {
-        cooldown--;
-        if (cooldown == 0) {
-            if (!target.attackEntityFrom(DamageSource.GENERIC, 3f)) {
-                cooldown++;
-                return;
+        for (Pair<Entity, Integer> target : targets) {
+            target.B--;
+            if (target.B == 0) {
+                if (!target.A.attackEntityFrom(DamageSource.GENERIC, damage)) {
+                    target.B++;
+                    return;
+                }
+                charges--;
+                target.B = attackSpeed;
+                if (target.A.isDead) {
+                    targets.remove(target);
+                }
+                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+                markDirty();
             }
-            charges--;
-            cooldown = 20;
-            if (target.isDead) {
-                target = null;
-            }
-            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
-            markDirty();
         }
     }
 
@@ -158,7 +191,6 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         compound.setInteger("charges", charges);
-        compound.setInteger("cooldown", cooldown);
         compound.setInteger("collectedEnergy", collectedEnergy);
         return compound;
     }
@@ -166,7 +198,6 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         charges = compound.getInteger("charges");
-        cooldown = compound.getInteger("cooldown");
         collectedEnergy = compound.getInteger("collectedEnergy");
         super.readFromNBT(compound);
     }
@@ -176,7 +207,11 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("charges", charges);
-        if (target != null) tag.setString("target", target.getPersistentID().toString());
+        String idString = "";
+        for (Pair<Entity, Integer> target : targets) {
+            idString += target.A.getPersistentID().toString() + ',';
+        }
+        if (!idString.isEmpty()) tag.setString("target", idString);
         return new SPacketUpdateTileEntity(getPos(), 1, tag);
     }
 
@@ -185,9 +220,27 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         NBTTagCompound tag = pkt.getNbtCompound();
         charges = tag.getInteger("charges");
         if (!tag.getString("target").isEmpty()) {
-            target = findByUUID(UUID.fromString(tag.getString("target")));
+            for (String target : tag.getString("target").split(",")) {
+                targets.add(new Pair<>(findByUUID(UUID.fromString(target)), 0));
+            }
         } else {
-            target = null;
+            targets.clear();
         }
+    }
+
+    public int getBaseTargets() {
+        return baseTargets + additionalTargets;
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public int getAttackSpeed() {
+        return attackSpeed;
+    }
+
+    public int getRange() {
+        return range;
     }
 }
