@@ -131,9 +131,11 @@ public class TileLaserTurret extends TileEntity implements ITickable {
 
             Vector3d curDiff = new Vector3d();
             for (int i = 0; i < Math.floor(posSteps); i++) {
-                world.spawnParticle(EnumParticleTypes.REDSTONE,
-                        blockPos.x + curDiff.x, blockPos.y + curDiff.y, blockPos.z + curDiff.z,
-                        0, 0, 0);
+                if (world.rand.nextInt(200) == 0) {
+                    world.spawnParticle(EnumParticleTypes.REDSTONE,
+                            blockPos.x + curDiff.x, blockPos.y + curDiff.y, blockPos.z + curDiff.z,
+                            0, 0, 0);
+                }
                 curDiff.add(step);
             }
         }
