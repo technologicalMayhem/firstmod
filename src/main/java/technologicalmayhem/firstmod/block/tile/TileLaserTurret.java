@@ -52,7 +52,6 @@ public class TileLaserTurret extends TileEntity implements ITickable {
 
     private void charge() {
         if (world.isDaytime()) {
-            checkSensors();
             collectedEnergy += connectedSensors;
             if (collectedEnergy >= 1600) {
                 collectedEnergy = 0;
@@ -64,21 +63,17 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         }
     }
 
-    private void checkSensors() {
-        if (checkInterval >= 0) {
-            int count = 0;
-            int[][] offsets = new int[][]{{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
-            for (int[] offset : offsets) {
-                if (world.getBlockState(pos.add(offset[0], -2, offset[1])).getBlock() instanceof BlockLaserEnergyCollector
-                        && world.canBlockSeeSky(pos.add(offset[0], -2, offset[1]).up())) {
-                    count++;
-                }
+    public void checkSensors() {
+        int count = 0;
+        int[][] offsets = new int[][]{{1, 0}, {1, 1}, {1, -1}, {-1, 0}, {-1, 1}, {-1, -1}, {0, 1}, {0, -1}};
+        for (int[] offset : offsets) {
+            if (world.getBlockState(pos.add(offset[0], -2, offset[1])).getBlock() instanceof BlockLaserEnergyCollector
+                    && world.canBlockSeeSky(pos.add(offset[0], -2, offset[1]).up())) {
+                count++;
             }
-            checkInterval = 100;
-            connectedSensors = count;
-        } else {
-            checkInterval--;
         }
+        checkInterval = 100;
+        connectedSensors = count;
     }
 
     private void validateTargets() {
