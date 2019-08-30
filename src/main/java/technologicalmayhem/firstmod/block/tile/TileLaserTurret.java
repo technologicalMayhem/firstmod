@@ -1,7 +1,6 @@
 package technologicalmayhem.firstmod.block.tile;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -24,17 +23,12 @@ import java.util.UUID;
 
 public class TileLaserTurret extends TileEntity implements ITickable {
 
-    //Base Values
-    private final int baseTargets = 1;
-    private final float damage = 3.0F;
-    private final int attackSpeed = 20;
-    private final int range = 10;
     private int charges = 0;
     private int collectedEnergy = 0;
     private int connectedSensors = 0;
     private int checkInterval = 0;
     private List<Pair<Entity, Integer>> targets = new ArrayList<>();
-    //Modifiers
+
     private int additionalTargets = 0;
     private float damageMod = 1.0F;
     private float speedMod = 1.0F;
@@ -106,7 +100,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     }
 
     private boolean isTargetValid(Entity target) {
-        return target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && target.isEntityAlive();
+        return target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < getRange() && target.isEntityAlive();
     }
 
     private void doParticles() {
@@ -136,6 +130,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     }
 
     private void searchForNewTargets() {
+        int range = getRange();
         List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, 3, range), pos.add(-range, -3, -range)));
         entities.removeIf(entity -> !(entity instanceof IMob));
         for (Pair<Entity, Integer> target : targets) {
@@ -147,7 +142,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
             int missingTargets = Math.abs(getBaseTargets() - targets.size());
             List<Entity> available = entities.subList(0, Math.min(missingTargets, entities.size()));
             for (Entity entity : available) {
-                targets.add(new Pair<>(entity, attackSpeed));
+                targets.add(new Pair<>(entity, getAttackSpeed()));
             }
             world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
             markDirty();
@@ -158,12 +153,12 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         for (Pair<Entity, Integer> target : targets) {
             target.B--;
             if (target.B == 0) {
-                if (!target.A.attackEntityFrom(DamageSource.GENERIC, damage)) {
+                if (!target.A.attackEntityFrom(DamageSource.GENERIC, getDamage())) {
                     target.B++;
                     return;
                 }
                 charges--;
-                target.B = attackSpeed;
+                target.B = getAttackSpeed();
                 if (target.A.isDead) {
                     targets.remove(target);
                 }
@@ -174,6 +169,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     }
 
     private Entity findByUUID(UUID uuid) {
+        int range = getRange();
         List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
         if (!entities.isEmpty()) {
             for (Entity ent : entities) {
@@ -224,18 +220,22 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     }
 
     private int getBaseTargets() {
+        int baseTargets = 1;
         return baseTargets + additionalTargets;
     }
 
     private float getDamage() {
-        return damage;
+        float damage = 3.0F;
+        return damage * damageMod;
     }
 
     private int getAttackSpeed() {
-        return attackSpeed;
+        int attackSpeed = 20;
+        return (int) (attackSpeed * speedMod);
     }
 
     private int getRange() {
-        return range;
+        int range = 10;
+        return (int) (range * rangeMod);
     }
 }
