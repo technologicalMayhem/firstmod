@@ -173,10 +173,10 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         }
     }
 
-    private EntityMob findByUUID(UUID uuid) {
-        List<EntityMob> entities = world.getEntitiesWithinAABB(EntityMob.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
+    private Entity findByUUID(UUID uuid) {
+        List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos.add(range, range, range), pos.add(-range, -range, -range)));
         if (!entities.isEmpty()) {
-            for (EntityMob ent : entities) {
+            for (Entity ent : entities) {
                 if (ent.getPersistentID().equals(uuid)) return ent;
             }
         }
@@ -216,11 +216,10 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         NBTTagCompound tag = pkt.getNbtCompound();
         charges = tag.getInteger("charges");
         if (!tag.getString("target").isEmpty()) {
+            targets.clear();
             for (String target : tag.getString("target").split(",")) {
                 targets.add(new Pair<>(findByUUID(UUID.fromString(target)), 0));
             }
-        } else {
-            targets.clear();
         }
     }
 
