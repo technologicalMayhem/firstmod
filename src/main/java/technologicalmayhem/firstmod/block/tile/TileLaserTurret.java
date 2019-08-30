@@ -100,19 +100,13 @@ public class TileLaserTurret extends TileEntity implements ITickable {
                 if (!world.isRemote) markDirty();
             }
         }
-        for (Pair<Entity, Integer> target : targets) {
-
-        }
         if (!world.isRemote && (targets.size() < getBaseTargets() || !areAllValid)) {
             searchForNewTargets();
         }
     }
 
     private boolean isTargetValid(Entity target) {
-        if (target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && target.isEntityAlive()) {
-            return true;
-        }
-        return false;
+        return target != null && target.getDistance(pos.getX(), pos.getY(), pos.getZ()) < range && target.isEntityAlive();
     }
 
     private void doParticles() {
@@ -209,11 +203,11 @@ public class TileLaserTurret extends TileEntity implements ITickable {
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("charges", charges);
-        String idString = "";
+        StringBuilder idString = new StringBuilder();
         for (Pair<Entity, Integer> target : targets) {
-            idString += target.A.getPersistentID().toString() + ',';
+            idString.append(target.A.getPersistentID().toString()).append(',');
         }
-        if (!idString.isEmpty()) tag.setString("target", idString);
+        if (idString.length() > 0) tag.setString("target", idString.toString());
         return new SPacketUpdateTileEntity(getPos(), 1, tag);
     }
 
@@ -230,19 +224,19 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         }
     }
 
-    public int getBaseTargets() {
+    private int getBaseTargets() {
         return baseTargets + additionalTargets;
     }
 
-    public float getDamage() {
+    private float getDamage() {
         return damage;
     }
 
-    public int getAttackSpeed() {
+    private int getAttackSpeed() {
         return attackSpeed;
     }
 
-    public int getRange() {
+    private int getRange() {
         return range;
     }
 }
