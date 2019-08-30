@@ -60,7 +60,7 @@ public class TileLaserTurret extends TileEntity implements ITickable {
         if (world.isDaytime()) {
             checkSensors();
             collectedEnergy += connectedSensors;
-            if (collectedEnergy >= 1) {
+            if (collectedEnergy >= 1600) {
                 collectedEnergy = 0;
                 if (charges < 100) {
                     charges++;
